@@ -1,5 +1,6 @@
 package Order.Modal.Auth;
 
+import Order.Modal.System.Form;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import net.miginfocom.swing.MigLayout;
@@ -8,7 +9,7 @@ import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class LoginForm extends JPanel {
+public class LoginForm extends Form {
     public LoginForm() {
         init();
     }
