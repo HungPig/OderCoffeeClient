@@ -103,7 +103,7 @@ public class Login extends Form {
         LabelButton lbLink = new LabelButton("help@info.com");
 
         panelInfo.add(lbLink);
-
+//
         // event
         lbLink.addOnClick(e -> {
 
