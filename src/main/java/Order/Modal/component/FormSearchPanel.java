@@ -45,7 +45,7 @@ public class FormSearchPanel extends JPanel {
         textSearch = new JTextField();
         panelResult = new JPanel(new MigLayout("insets 3 10 3 10,fillx,wrap", "[fill]"));
         textSearch.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Search...");
-        textSearch.putClientProperty(FlatClientProperties.TEXT_FIELD_LEADING_ICON, new FlatSVGIcon("raven/modal/demo/icons/search.svg", 0.4f));
+        textSearch.putClientProperty(FlatClientProperties.TEXT_FIELD_LEADING_ICON, new FlatSVGIcon("Order/icons/search.svg", 0.4f));
         textSearch.putClientProperty(FlatClientProperties.STYLE, "" +
                 "border:3,3,3,3;" +
                 "background:null;" +
