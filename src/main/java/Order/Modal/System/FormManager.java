@@ -74,7 +74,7 @@ public class FormManager {
         Drawer.setVisible(false);
         frame.getContentPane().removeAll();
         Login form = getLogin();
-        login.formCheck();
+        form.formCheck();
         frame.getContentPane().add(login);
         FORMS.clear();
         frame.repaint();
