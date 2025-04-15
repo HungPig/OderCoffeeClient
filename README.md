@@ -45,7 +45,7 @@ Add the snapshot version
 ```
 
 ## Demo
-Get jar file here: [latest-releases](https://github.com/DJ-Raven/swing-modal-dialog/releases/latest)
+Get jar file here: [latest-releases]()
 
 ## Document
 
