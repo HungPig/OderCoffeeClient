@@ -27,6 +27,7 @@ public class OrderMain extends javax.swing.JFrame {
         FormManager.install(this);
         setSize(new Dimension(1366, 768));
         setLocationRelativeTo(null);
+        //o
     }
 
     public static void main(String[] args) {
