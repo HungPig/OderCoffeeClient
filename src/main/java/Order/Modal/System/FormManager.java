@@ -1,11 +1,8 @@
 package Order.Modal.System;
 
 import Order.Modal.Auth.Login;
-import Order.Modal.Auth.LoginForm;
-import Order.Modal.untils.UndoRedo;
+import Order.Modal.Utils.UndoRedo;
 import raven.modal.Drawer;
-import raven.modal.ModalDialog;
-import raven.modal.component.SimpleModalBorder;
 
 
 import javax.swing.*;
@@ -65,17 +62,16 @@ public class FormManager {
     }
 
     public static void login() {
-//        Drawer.setVisible(true);
+        Drawer.setVisible(true);
         frame.getContentPane().removeAll();
         frame.getContentPane().add(getMainForm());
-
 //        Drawer.setSelectedItemClass(FormDashboard.class);
         frame.repaint();
         frame.revalidate();
     }
 
     public static void logout() {
-//        Drawer.setVisible(false);
+        Drawer.setVisible(false);
         frame.getContentPane().removeAll();
         Login form = getLogin();
         login.formCheck();
