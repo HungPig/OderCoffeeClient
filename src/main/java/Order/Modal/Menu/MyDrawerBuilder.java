@@ -67,8 +67,8 @@ public class MyDrawerBuilder extends SimpleDrawerBuilder {
     }
 
     @Override
-    public Option getOption() {
-        Option option = super.getOption();
+    public Option createOption() {
+        Option option = super.createOption();
         option.setOpacity(0.3f);
         option.getBorderOption()
                 .setShadowSize(new Insets(0, 0, 0, SHADOW_SIZE));
