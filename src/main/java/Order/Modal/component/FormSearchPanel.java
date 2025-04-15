@@ -378,7 +378,7 @@ public class FormSearchPanel extends JPanel {
                 JButton cmdFavorite = createButton("favorite", "favorite.svg", 0.4f, "Component.accentColor", 0.9f);
                 panel.add(cmdFavorite);
             } else {
-                JLabel label = new JLabel(new SVGIconUIColor("raven/modal/demo/icons/favorite_filled.svg", 0.4f, "Component.accentColor", 0.8f));
+                JLabel label = new JLabel(new SVGIconUIColor("Order/icons/favorite_filled.svg", 0.4f, "Component.accentColor", 0.8f));
                 label.putClientProperty(FlatClientProperties.STYLE, "" +
                         "border:3,3,3,3;");
                 panel.add(label);
