@@ -36,7 +36,8 @@ public class MyDrawerBuilder extends SimpleDrawerBuilder {
 
     @Override
     public SimpleHeaderData getSimpleHeaderData() {
-        AvatarIcon icon = new AvatarIcon(new FlatSVGIcon("raven/modal/demo/drawer/image/avatar_male.svg", 100, 100), 50, 50, 3.5f);
+        ImageIcon imageIcon = new ImageIcon(getClass().getResource("/Order/drawer/image/Virus.jpg"));
+        AvatarIcon icon = new AvatarIcon(imageIcon, 50, 50, 3.5f);
         icon.setType(AvatarIcon.Type.MASK_SQUIRCLE);
         icon.setBorder(2, 2);
 
@@ -139,7 +140,7 @@ public class MyDrawerBuilder extends SimpleDrawerBuilder {
         });
 
         simpleMenuOption.setMenus(items)
-                .setBaseIconPath("raven/modal/demo/drawer/icon")
+                .setBaseIconPath("Order/drawer/icon/")
                 .setIconScale(0.45f);
 
         return simpleMenuOption;

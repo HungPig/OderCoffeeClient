@@ -14,9 +14,11 @@ import java.awt.*;
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class OrderMain extends javax.swing.JFrame {
     public static final String DEMO_VERSION = "2.4.1-SNAPSHOT";
+
     public OrderMain() {
         init();
     }
+
     private void init() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         getRootPane().putClientProperty(FlatClientProperties.FULL_WINDOW_CONTENT, true);
@@ -33,4 +35,5 @@ public class OrderMain extends javax.swing.JFrame {
         UIManager.put("defaultFont", new Font(FlatRobotoFont.FAMILY, Font.PLAIN, 13));
         DemoPreferences.setupLaf();
         EventQueue.invokeLater(() -> new OrderMain().setVisible(true));
+    }
 }
