@@ -33,6 +33,4 @@ public class OrderMain extends javax.swing.JFrame {
         UIManager.put("defaultFont", new Font(FlatRobotoFont.FAMILY, Font.PLAIN, 13));
         DemoPreferences.setupLaf();
         EventQueue.invokeLater(() -> new OrderMain().setVisible(true));
-    }
-
 }
