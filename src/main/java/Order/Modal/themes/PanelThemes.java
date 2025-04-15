@@ -1,19 +1,17 @@
 package Order.Modal.themes;
-
 import Order.Modal.untils.DemoPreferences;
 import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.IntelliJTheme;
 import com.formdev.flatlaf.extras.FlatAnimatedLafChange;
 import com.formdev.flatlaf.util.LoggingFacade;
 import net.miginfocom.swing.MigLayout;
-
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.event.ListSelectionEvent;
 import java.awt.*;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 
 public class PanelThemes extends JPanel {
 
