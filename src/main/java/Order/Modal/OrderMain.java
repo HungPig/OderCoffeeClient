@@ -1,9 +1,11 @@
 package Order.Modal;
 
+import Order.Modal.Auth.LoginForm;
 import Order.Modal.System.FormManager;
 import Order.Modal.untils.DemoPreferences;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.FlatLaf;
+import com.formdev.flatlaf.FlatLightLaf;
 import com.formdev.flatlaf.fonts.roboto.FlatRobotoFont;
 import com.formdev.flatlaf.util.FontUtils;
 import raven.modal.Drawer;
@@ -30,12 +32,21 @@ public class OrderMain extends javax.swing.JFrame {
 
     public static void main(String[] args) {
 
-        DemoPreferences.init();
-        FlatRobotoFont.install();
-        FlatLaf.registerCustomDefaultsSource("Login.themes");
-        UIManager.put("defaultFont", FontUtils.getCompositeFont(FlatRobotoFont.FAMILY, Font.PLAIN, 13));
-        DemoPreferences.setupLaf();
-        EventQueue.invokeLater(() -> new OrderMain().setVisible(true));
+        try {
+            UIManager.setLookAndFeel(new FlatLightLaf());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        // Hiển thị LoginForm
+        SwingUtilities.invokeLater(() -> {
+            JFrame frame = new JFrame("Login");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setContentPane(new LoginForm());
+            frame.pack();
+            frame.setLocationRelativeTo(null);
+            frame.setVisible(true);
+        });
 
     }
 }
