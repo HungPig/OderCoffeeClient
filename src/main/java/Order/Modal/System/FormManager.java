@@ -1,7 +1,8 @@
 package Order.Modal.System;
 
-import Order.Modal.Auth.Login;
+import Order.Modal.Auth.LoginForm;
 import Order.Modal.Utils.UndoRedo;
+import lombok.extern.java.Log;
 import raven.modal.Drawer;
 
 
@@ -12,7 +13,7 @@ public class FormManager {
     protected static final UndoRedo<Form> FORMS = new UndoRedo<>();
     private static JFrame frame;
     private static MainForm mainForm;
-    private static Login login;
+    private static LoginForm login;
 
     public static void install(JFrame f) {
         frame = f;
@@ -73,7 +74,7 @@ public class FormManager {
     public static void logout() {
         Drawer.setVisible(false);
         frame.getContentPane().removeAll();
-        Login form = getLogin();
+        LoginForm form = getLogin();
         form.formCheck();
         frame.getContentPane().add(login);
         FORMS.clear();
@@ -92,9 +93,9 @@ public class FormManager {
         return mainForm;
     }
 
-    private static Login getLogin() {
+    private static LoginForm getLogin() {
         if (login == null) {
-            login = new Login();
+            login = new LoginForm();
         }
         return login;
     }
