@@ -54,9 +54,9 @@ public class MainForm extends JPanel {
                 Drawer.toggleMenuOpenMode();
             }
         });
-//        buttonUndo.addActionListener(e -> FormManager.undo());
-//        buttonRedo.addActionListener(e -> FormManager.redo());
-//        buttonRefresh.addActionListener(e -> FormManager.refresh());
+        buttonUndo.addActionListener(e -> FormManager.undo());
+        buttonRedo.addActionListener(e -> FormManager.redo());
+        buttonRefresh.addActionListener(e -> FormManager.refresh());
 
         toolBar.add(buttonDrawer);
         toolBar.add(buttonUndo);
@@ -104,7 +104,7 @@ public class MainForm extends JPanel {
     private JPanel createSearchBox() {
         JPanel panel = new JPanel(new MigLayout("fill", "[fill,center,200:250:]", "[fill]"));
         FormSearchButton button = new FormSearchButton();
-//        button.addActionListener(e -> FormSearch.getInstance().showSearch());
+        button.addActionListener(e -> FormSearch.getInstance().showSearch());
         panel.add(button);
         return panel;
     }
@@ -126,8 +126,8 @@ public class MainForm extends JPanel {
         mainPanel.revalidate();
 
         // check button
-//        buttonUndo.setEnabled(FormManager.FORMS.isUndoAble());
-//        buttonRedo.setEnabled(FormManager.FORMS.isRedoAble());
+        buttonUndo.setEnabled(FormManager.FORMS.isUndoAble());
+        buttonRedo.setEnabled(FormManager.FORMS.isRedoAble());
         // check component orientation and update
         if (mainPanel.getComponentOrientation().isLeftToRight() != form.getComponentOrientation().isLeftToRight()) {
             applyComponentOrientation(mainPanel.getComponentOrientation());
