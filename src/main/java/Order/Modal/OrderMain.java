@@ -1,15 +1,12 @@
 package Order.Modal;
 
 
-import Order.Modal.Auth.LoginForm;
 import Order.Modal.System.FormManager;
-import Order.Modal.untils.DemoPreferences;
+import Order.Modal.Utils.DemoPreferences;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.fonts.roboto.FlatRobotoFont;
-import com.formdev.flatlaf.util.FontUtils;
 import Order.Modal.Menu.MyDrawerBuilder;
-//import Order.Modal.Ultis.DemoPreference
 import raven.modal.Drawer;
 
 import javax.swing.*;
@@ -38,17 +35,6 @@ public class OrderMain extends javax.swing.JFrame {
         FlatLaf.registerCustomDefaultsSource("raven.modal.demo.themes");
         UIManager.put("defaultFont", new Font(FlatRobotoFont.FAMILY, Font.PLAIN, 13));
         DemoPreferences.setupLaf();
-
-        EventQueue.invokeLater(() -> {
-            // Tạo một JFrame để chứa LoginForm
-            JFrame loginFrame = new JFrame("Đăng nhập");
-            loginFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            loginFrame.setSize(400, 500); // hoặc điều chỉnh theo kích thước bạn muốn
-            loginFrame.setLocationRelativeTo(null); // căn giữa
-
-            LoginForm loginForm = new LoginForm();
-            loginFrame.setContentPane(loginForm);
-            loginFrame.setVisible(true);
-        });
+        EventQueue.invokeLater(() -> new OrderMain().setVisible(true));
     }
 }

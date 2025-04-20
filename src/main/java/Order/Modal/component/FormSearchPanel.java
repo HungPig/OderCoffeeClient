@@ -3,8 +3,8 @@ package Order.Modal.component;
 import Order.Modal.System.Form;
 import Order.Modal.System.FormSearch;
 import Order.Modal.icons.SVGIconUIColor;
-import Order.Modal.untils.DemoPreferences;
-import Order.Modal.untils.SystemForm;
+import Order.Modal.Utils.DemoPreferences;
+import Order.Modal.Utils.SystemForm;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import com.formdev.flatlaf.icons.FlatMenuArrowIcon;
@@ -378,7 +378,7 @@ public class FormSearchPanel extends JPanel {
                 JButton cmdFavorite = createButton("favorite", "favorite.svg", 0.4f, "Component.accentColor", 0.9f);
                 panel.add(cmdFavorite);
             } else {
-                JLabel label = new JLabel(new SVGIconUIColor("raven/modal/demo/icons/favorite_filled.svg", 0.4f, "Component.accentColor", 0.8f));
+                JLabel label = new JLabel(new SVGIconUIColor("Order/icons/favorite_filled.svg", 0.4f, "Component.accentColor", 0.8f));
                 label.putClientProperty(FlatClientProperties.STYLE, "" +
                         "border:3,3,3,3;");
                 panel.add(label);
