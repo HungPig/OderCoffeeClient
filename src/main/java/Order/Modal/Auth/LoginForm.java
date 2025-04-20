@@ -1,112 +1,131 @@
 package Order.Modal.Auth;
 
+import Order.Modal.OrderMain;
 import Order.Modal.System.Form;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class LoginForm extends Form {
+    // Biến toàn cục để dễ truy xuất trong init() và listener
+    private JTextField     txtEmail;
+    private JPasswordField txtPassword;
+    private JButton        cmdSignIn;
+
     public LoginForm() {
         init();
     }
-    private void init()
-    {
-        setLayout(new MigLayout("wrap,gapy 3","[fill,300]"));
 
-        add(new JLabel(new FlatSVGIcon("Order/icons/logo.svg",1.5f)));
-        JLabel lbTitle= new JLabel("Welcome back", JLabel.CENTER);
-        lbTitle.putClientProperty(FlatClientProperties.STYLE,""+"font:bold +15;");
-        add(lbTitle, "gapy 8 8");
+    private void init() {
+        // 1) Root panel: BorderLayout để có thể căn giữa panel con
+        setLayout(new BorderLayout());
+        setBackground(new Color(240, 240, 240)); // nền xám nhạt phía ngoài card
 
-        add(new JLabel("Sign in to  access  to your dashboard,",JLabel.CENTER ));
-        add(new JLabel("Setting and projects.",JLabel.CENTER ));
+        // 2) Tạo "card" chứa form, dùng MigLayout để dễ căn chỉnh
+        JPanel card = new JPanel(new MigLayout(
+                "wrap, insets 20, align center center", // layout constraints
+                "[300!]",                               // mỗi cột cố định 300px
+                "[]10[]10[]10[]10[]"                    // gap 10px giữa các hàng nhóm
+        ));
+        card.setBackground(Color.WHITE);
+        card.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(200, 200, 200), 1),
+                BorderFactory.createEmptyBorder(10, 10, 10, 10)
+        ));
 
-        JLabel lbSeparator= new JLabel("Sign in with Email");
-        lbSeparator.putClientProperty(FlatClientProperties.STYLE,""
-                +"foreground:$Label.disabledForeground;"
-                +"font: -1;");
-        add(createJSeparator()," split 3, sizegroup g1");
-        add(lbSeparator,"sizegroup g1");
-        add(createJSeparator(),"sizegroup g1");
+        // 3) Nội dung bên trong card
+        // Logo
+        card.add(new JLabel(new FlatSVGIcon("Order/icons/logo.svg", 1.5f)),
+                "wrap, gapbottom 15");
 
-        JLabel lbEmail= new JLabel("Email");
-        lbEmail.putClientProperty(FlatClientProperties.STYLE,""+
-                "font: bold;");
-        add(lbEmail, "gapy 10 5");
+        // Tiêu đề
+        JLabel lbTitle = new JLabel("Welcome back", JLabel.CENTER);
+        lbTitle.putClientProperty(FlatClientProperties.STYLE, "font:bold +15;");
+        card.add(lbTitle, "wrap, gapbottom 5");
 
-        JTextField txtEmail= new JTextField();
-        txtEmail.putClientProperty(FlatClientProperties.STYLE, ""
-                +"iconTextGap:10;");
-        txtEmail.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT,"Enter your email");
-        txtEmail.putClientProperty(FlatClientProperties.TEXT_FIELD_LEADING_ICON, new FlatSVGIcon("Order/icons/email.svg",0.35f));
-        add(txtEmail);
+        // Subtitle
+        card.add(new JLabel("Sign in to access to your dashboard,", JLabel.CENTER),
+                "wrap");
+        card.add(new JLabel("Setting and projects.", JLabel.CENTER),
+                "wrap, gapbottom 15");
 
-        JLabel lbPassword= new JLabel("Password");
-        lbPassword.putClientProperty(FlatClientProperties.STYLE,""+
-                "font: bold;");
-        add(lbPassword, "grow 0, gapy 10 5");
+        // Separator với text
+        JLabel lbSeparator = new JLabel("Sign in with Email", JLabel.CENTER);
+        lbSeparator.putClientProperty(FlatClientProperties.STYLE,
+                "foreground:$Label.disabledForeground;font:-1;");
+        card.add(createJSeparator(), "growx, split 3");
+        card.add(lbSeparator,            "growx");
+        card.add(createJSeparator(),     "growx, wrap, gapbottom 20");
 
-        JPasswordField txtPassword = new JPasswordField();
-        txtPassword.putClientProperty(FlatClientProperties.STYLE, ""
-                +"iconTextGap:10;"+
-                "showRevealButton:true;");
-        txtPassword.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT,"Enter your password");
-        txtPassword.putClientProperty(FlatClientProperties.TEXT_FIELD_LEADING_ICON, new FlatSVGIcon("Order/icons/password.svg",0.35f));
-        //txtPassword.putClientProperty(FlatClientProperties.TEXT_FIELD_TRAILING_ICON, new FlatSVGIcon("Order/Login/icon/eye.svg",0.6f));
-        JLabel eyeIcon = new JLabel(new FlatSVGIcon("Order/Login/icon/eye.svg", 0.6f));
-        txtPassword.putClientProperty(FlatClientProperties.TEXT_FIELD_TRAILING_ICON, eyeIcon);
+        // Email label + field
+        card.add(new JLabel("Email"), "wrap, gapbottom 5");
+        txtEmail = new JTextField();
+        txtEmail.putClientProperty(FlatClientProperties.STYLE,
+                "iconTextGap:10;");
+        txtEmail.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT,
+                "Enter your email");
+        txtEmail.putClientProperty(FlatClientProperties.TEXT_FIELD_LEADING_ICON,
+                new FlatSVGIcon("Order/icons/email.svg", 0.35f));
+        card.add(txtEmail, "growx, wrap");
 
+        // Password label + field
+        card.add(new JLabel("Password"), "wrap, gapbottom 5");
+        txtPassword = new JPasswordField();
+        txtPassword.putClientProperty(FlatClientProperties.STYLE,
+                "iconTextGap:10;showRevealButton:true;");
+        txtPassword.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT,
+                "Enter your password");
+        txtPassword.putClientProperty(FlatClientProperties.TEXT_FIELD_LEADING_ICON,
+                new FlatSVGIcon("Order/icons/password.svg", 0.35f));
+        // Custom reveal-icon
+        JLabel eyeIcon = new JLabel(new FlatSVGIcon("Order/icons/eye.svg", 0.6f));
+        txtPassword.putClientProperty(FlatClientProperties.TEXT_FIELD_TRAILING_ICON,
+                eyeIcon);
         eyeIcon.addMouseListener(new MouseAdapter() {
-            private boolean passwordVisible = false;
-
+            private boolean visible = false;
             @Override
             public void mouseClicked(MouseEvent e) {
-                passwordVisible = !passwordVisible;
-                if (passwordVisible) {
-                    txtPassword.setEchoChar((char) 0); // Hiện mật khẩu
-                } else {
-                    txtPassword.setEchoChar('•'); // Ẩn mật khẩu
-                }
+                visible = !visible;
+                txtPassword.setEchoChar(visible ? (char)0 : '•');
             }
         });
-        add(txtPassword);
+        card.add(txtPassword, "growx, wrap");
 
-        add(new JCheckBox("Remember me"), "gapy 10 10");
+        // Remember me
+        card.add(new JCheckBox("Remember me"), "wrap, gapbottom 20");
 
-        JButton cmdSignIn= new JButton("Sign in", new FlatSVGIcon("Order/icons/next.svg")){
+        // Sign in button
+        cmdSignIn = new JButton("Sign in", new FlatSVGIcon("Order/icons/next.svg")) {
             @Override
-            public boolean isDefaultButton(){
+            public boolean isDefaultButton() {
                 return true;
             }
         };
-        cmdSignIn.putClientProperty((FlatClientProperties.STYLE), ""+
-                "foreground:#FFFFFF;"+
-                "iconTextGap:10;");
-        cmdSignIn.setHorizontalTextPosition(JButton.LEADING);
-        add(cmdSignIn,"gapy n 10");
+        cmdSignIn.putClientProperty(FlatClientProperties.STYLE,
+                "foreground:#FFFFFF;iconTextGap:10;");
+        cmdSignIn.setHorizontalTextPosition(SwingConstants.LEADING);
+        cmdSignIn.setPreferredSize(new Dimension(0, 40)); // cao 40px, rộng fill
+        card.add(cmdSignIn, "growx");
 
+        // 4) Xử lý khi nhấn Sign in
+        cmdSignIn.addActionListener(e -> {
+            Window win = SwingUtilities.getWindowAncestor(LoginForm.this);
+            win.dispose();             // đóng login
+            new OrderMain().setVisible(true); // mở chính
+        });
+
+        // 5) Đưa card vào chính giữa LoginForm
+        add(card, BorderLayout.CENTER);
     }
-    private JSeparator createJSeparator()
-    {
-        JSeparator separator= new JSeparator();
-        separator.putClientProperty(FlatClientProperties.STYLE, ""+
-                "stripeIndent:8;");
-        return separator;
-    }
-    private JButton createNoBorderButton(String text)
-    {
-        JButton button= new JButton(text);
-        button.putClientProperty(FlatClientProperties.STYLE, ""+
-                "foreground:$Compoment.accentColor;"+
-                "margin:1,5,1,5"+
-                "borderWidth:0;"+
-                "focusWidth:0;"+
-                "innerFocusWidth:0;"+
-                "background:null");
-        return button;
+
+    private JSeparator createJSeparator() {
+        JSeparator sep = new JSeparator();
+        sep.putClientProperty(FlatClientProperties.STYLE, "stripeIndent:8;");
+        return sep;
     }
 }

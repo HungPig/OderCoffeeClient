@@ -27,13 +27,12 @@ public class OrderMain extends javax.swing.JFrame {
         FormManager.install(this);
         setSize(new Dimension(1366, 768));
         setLocationRelativeTo(null);
-        //o
     }
 
     public static void main(String[] args) {
         DemoPreferences.init();
         FlatRobotoFont.install();
-        FlatLaf.registerCustomDefaultsSource("Order.themes");
+        FlatLaf.registerCustomDefaultsSource("raven.modal.demo.themes");
         UIManager.put("defaultFont", new Font(FlatRobotoFont.FAMILY, Font.PLAIN, 13));
         DemoPreferences.setupLaf();
         EventQueue.invokeLater(() -> new OrderMain().setVisible(true));
