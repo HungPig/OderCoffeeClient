@@ -4,6 +4,7 @@ import Order.Modal.OrderMain;
 import Order.Modal.System.AllForms;
 import Order.Modal.System.Form;
 import Order.Modal.System.FormManager;
+import Order.Modal.forms.FormDashboard;
 import Order.Modal.forms.FormSetting;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
@@ -88,6 +89,11 @@ public class MyDrawerBuilder extends SimpleDrawerBuilder {
 
         MenuItem items[] = new MenuItem[]{
                 new Item.Label("MASTER DATA"),
+                new Item("Product", "dashboard.svg" )
+                        .subMenu("ProductList")
+                        .subMenu("Categories"),
+                new Item.Label("MAIN MENU"),
+                new Item("Dashboard", "forms.svg",FormDashboard.class),
                 new Item("Product", "forms.svg")
                         .subMenu("ProductList")
                         .subMenu("Categories"),
@@ -134,6 +140,10 @@ public class MyDrawerBuilder extends SimpleDrawerBuilder {
                 } else if (i == 6) {
                     action.consume();
                     FormManager.logout();
+                    return;
+                }
+                if (itemClass == null || !Form.class.isAssignableFrom(itemClass)) {
+                    action.consume();
                     return;
                 }
                 if (itemClass == null || !Form.class.isAssignableFrom(itemClass)) {
