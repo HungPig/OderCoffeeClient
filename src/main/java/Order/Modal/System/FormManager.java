@@ -1,9 +1,11 @@
 package Order.Modal.System;
 
 import Order.Modal.Auth.LoginForm;
-import Order.Modal.Utils.UndoRedo;
-import lombok.extern.java.Log;
+import Order.Modal.utils.UndoRedo;
+import Order.Modal.dashboard.About;
 import raven.modal.Drawer;
+import raven.modal.ModalDialog;
+import raven.modal.component.SimpleModalBorder;
 
 
 import javax.swing.*;
@@ -99,10 +101,9 @@ public class FormManager {
         }
         return login;
     }
-
-//    public static void showAbout() {
-//        ModalDialog.showModal(frame, new SimpleModalBorder(new About(), "About"),
-//                ModalDialog.createOption().setAnimationEnabled(false)
-//        );
-//    }
+    public static void showAbout() {
+        ModalDialog.showModal(frame, new SimpleModalBorder(new About(), "About"),
+                ModalDialog.createOption().setAnimationEnabled(false)
+        );
+    }
 }
