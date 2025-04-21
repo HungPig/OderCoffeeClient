@@ -1,6 +1,10 @@
 package Order.Modal.Menu;
 
 import Order.Modal.OrderMain;
+import Order.Modal.System.AllForms;
+import Order.Modal.System.Form;
+import Order.Modal.System.FormManager;
+import Order.Modal.forms.FormDashboard;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import raven.extras.AvatarIcon;
@@ -82,11 +86,11 @@ public class MyDrawerBuilder extends SimpleDrawerBuilder {
 
         MenuItem items[] = new MenuItem[]{
                 new Item.Label("MASTER DATA"),
-                new Item("Product", "dashboard.svg")
+                new Item("Product", "dashboard.svg" )
                         .subMenu("ProductList")
                         .subMenu("Categories"),
                 new Item.Label("MAIN MENU"),
-                new Item("Dashboard", "forms.svg"),
+                new Item("Dashboard", "forms.svg",FormDashboard.class),
                 new Item("Orders", "components.svg"),
                 new Item("Customers", "email.svg"),
                 new Item("Reports", "chat.svg"),
@@ -130,12 +134,12 @@ public class MyDrawerBuilder extends SimpleDrawerBuilder {
                     //FormManager.logout();
                     return;
                 }
-//                if (itemClass == null || !Form.class.isAssignableFrom(itemClass)) {
-//                    action.consume();
-//                    return;
-//                }
-//                Class<? extends Form> formClass = (Class<? extends Form>) itemClass;
-//                FormManager.showForm(AllForms.getForm(formClass));
+                if (itemClass == null || !Form.class.isAssignableFrom(itemClass)) {
+                    action.consume();
+                    return;
+                }
+                Class<? extends Form> formClass = (Class<? extends Form>) itemClass;
+                FormManager.showForm(AllForms.getForm(formClass));
             }
         });
 
