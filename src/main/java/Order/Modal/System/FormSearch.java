@@ -2,7 +2,7 @@ package Order.Modal.System;
 
 import Order.Modal.component.EmptyModalBorder;
 import Order.Modal.component.FormSearchPanel;
-import Order.Modal.Utils.SystemForm;
+import Order.Modal.utils.SystemForm;
 import raven.modal.ModalDialog;
 import raven.modal.option.Location;
 import raven.modal.option.Option;
