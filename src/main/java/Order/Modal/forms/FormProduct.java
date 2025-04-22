@@ -129,7 +129,7 @@ public class FormProduct extends Form {
                 "background:$Table.background;");
 
         // create title
-        JLabel title = new JLabel("Custom table");
+        JLabel title = new JLabel("Product table");
         title.putClientProperty(FlatClientProperties.STYLE, "" +
                 "font:bold +2");
         add(title, "gapx 20");
