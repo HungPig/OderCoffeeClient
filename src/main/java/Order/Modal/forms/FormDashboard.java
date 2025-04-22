@@ -1,7 +1,7 @@
 package Order.Modal.forms;
 
 import Order.Modal.System.Form;
-import Order.Modal.Utils.SystemForm;
+import Order.Modal.utils.SystemForm;
 import Order.Modal.component.Chart.*;
 import Order.Modal.component.Chart.Themes.ColorThemes;
 import Order.Modal.component.Chart.Themes.DefaultChartTheme;
@@ -20,6 +20,7 @@ import org.jfree.chart.renderer.xy.CandlestickRenderer;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Objects;
 
 @SystemForm(name = "Dashboard", description = "dashboard form display some details")
 public class FormDashboard extends Form {
@@ -66,8 +67,7 @@ public class FormDashboard extends Form {
         JPanel panel = new JPanel(new MigLayout("fillx", "[]push[][]"));
         JLabel title = new JLabel("Dashboard");
 
-        title.putClientProperty(FlatClientProperties.STYLE, "" +
-                "font:bold +3");
+        title.putClientProperty(FlatClientProperties.STYLE, "font:bold +3");
 
         ToolBarSelection<ColorThemes> toolBarSelection = new ToolBarSelection<>(ColorThemes.values(), colorThemes -> {
             if (DefaultChartTheme.setChartColors(colorThemes)) {
@@ -93,8 +93,7 @@ public class FormDashboard extends Form {
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.getVerticalScrollBar().setUnitIncrement(10);
-        scrollPane.getVerticalScrollBar().putClientProperty(FlatClientProperties.STYLE, "" +
-                "width:5;" +
+        scrollPane.getVerticalScrollBar().putClientProperty(FlatClientProperties.STYLE, "width:5;" +
                 "trackArc:$ScrollBar.thumbArc;" +
                 "trackInsets:0,0,0,0;" +
                 "thumbInsets:0,0,0,0;");
@@ -120,7 +119,7 @@ public class FormDashboard extends Form {
         timeSeriesChart.add(new ToolBarTimeSeriesChartRenderer(timeSeriesChart), "al trailing,grow 0", 0);
         candlestickChart.add(new ToolBarSelection<>(new String[]{"default", "red_green"}, s -> {
             CandlestickRenderer renderer = (CandlestickRenderer) candlestickChart.getFreeChart().getXYPlot().getRenderer();
-            if (s == "default") {
+            if (Objects.equals(s, "default")) {
                 renderer.setAutoPopulateSeriesPaint(true);
                 DefaultChartTheme.applyTheme(candlestickChart.getFreeChart());
             } else {
@@ -157,9 +156,9 @@ public class FormDashboard extends Form {
     private SpiderChart spiderChart;
     private PieChart pieChart;
 
-    private class DashboardLayout implements LayoutManager {
+    private static class DashboardLayout implements LayoutManager {
 
-        private int gap = 0;
+        private final int gap = 0;
 
         @Override
         public void addLayoutComponent(String name, Component comp) {

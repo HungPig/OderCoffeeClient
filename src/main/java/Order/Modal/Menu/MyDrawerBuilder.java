@@ -4,16 +4,12 @@ import Order.Modal.OrderMain;
 import Order.Modal.System.AllForms;
 import Order.Modal.System.Form;
 import Order.Modal.System.FormManager;
-import Order.Modal.forms.FormDashboard;
-import Order.Modal.forms.FormSetting;
+import Order.Modal.forms.*;
 import com.formdev.flatlaf.FlatClientProperties;
-import com.formdev.flatlaf.extras.FlatSVGIcon;
 import raven.extras.AvatarIcon;
 import raven.modal.drawer.DrawerPanel;
 import raven.modal.drawer.item.Item;
 import raven.modal.drawer.item.MenuItem;
-import raven.modal.drawer.menu.MenuAction;
-import raven.modal.drawer.menu.MenuEvent;
 import raven.modal.drawer.menu.MenuOption;
 import raven.modal.drawer.menu.MenuStyle;
 import raven.modal.drawer.renderer.DrawerStraightDotLineStyle;
@@ -26,8 +22,8 @@ import raven.modal.option.Option;
 import javax.swing.*;
 import java.awt.*;
 import java.util.Arrays;
+import java.util.Objects;
 
-import static Order.Modal.System.FormManager.showAbout;
 
 public class MyDrawerBuilder extends SimpleDrawerBuilder {
 
@@ -43,7 +39,7 @@ public class MyDrawerBuilder extends SimpleDrawerBuilder {
 
     @Override
     public SimpleHeaderData getSimpleHeaderData() {
-        ImageIcon imageIcon = new ImageIcon(getClass().getResource("/Order/drawer/image/Virus.jpg"));
+        ImageIcon imageIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/Order/drawer/image/Virus.jpg")));
         AvatarIcon icon = new AvatarIcon(imageIcon, 50, 50, 3.5f);
         icon.setType(AvatarIcon.Type.MASK_SQUIRCLE);
         icon.setBorder(2, 2);
@@ -87,19 +83,14 @@ public class MyDrawerBuilder extends SimpleDrawerBuilder {
         // create simple menu option
         MenuOption simpleMenuOption = new MenuOption();
 
-        MenuItem items[] = new MenuItem[]{
+        MenuItem[] items = new MenuItem[]{
                 new Item.Label("MASTER DATA"),
-                new Item("Product", "dashboard.svg" )
-                        .subMenu("ProductList")
-                        .subMenu("Categories"),
-                new Item.Label("MAIN MENU"),
-                new Item("Dashboard", "forms.svg",FormDashboard.class),
                 new Item("Product", "forms.svg")
-                        .subMenu("ProductList")
-                        .subMenu("Categories"),
+                        .subMenu("ProductList", FormProduct.class)
+                        .subMenu("Categories", FormCategory.class),
                 new Item.Label("MAIN MENU"),
-                new Item("Dashboard", "dashboard.svg"),
-                new Item("Orders", "components.svg"),
+                new Item("Dashboard", "dashboard.svg",FormDashboard.class),
+                new Item("Orders", "components.svg", FormOrder.class),
                 new Item("Customers", "email.svg"),
                 new Item("Setting", "setting.svg", FormSetting.class),
                 new Item.Label("OTHER"),
@@ -114,8 +105,7 @@ public class MyDrawerBuilder extends SimpleDrawerBuilder {
                 boolean isTopLevel = index.length == 1;
                 if (isTopLevel) {
                     // adjust item menu at the top level because it's contain icon
-                    menu.putClientProperty(FlatClientProperties.STYLE, "" +
-                            "margin:-1,0,-1,0;");
+                    menu.putClientProperty(FlatClientProperties.STYLE, "margin:-1,0,-1,0;");
                 }
             }
 
@@ -127,31 +117,25 @@ public class MyDrawerBuilder extends SimpleDrawerBuilder {
 
         simpleMenuOption.getMenuStyle().setDrawerLineStyleRenderer(new DrawerStraightDotLineStyle());
         simpleMenuOption.setMenuItemAutoSelectionMode(MenuOption.MenuItemAutoSelectionMode.SELECT_SUB_MENU_LEVEL);
-        simpleMenuOption.addMenuEvent(new MenuEvent() {
-            @Override
-            public void selected(MenuAction action, int[] index) {
-                System.out.println("Drawer menu selected " + Arrays.toString(index));
-                Class<?> itemClass = action.getItem().getItemClass();
-                int i = index[0];
-                if (i == 5) {
-                    action.consume();
-                    FormManager.showAbout();
-                    return;
-                } else if (i == 6) {
-                    action.consume();
-                    FormManager.logout();
-                    return;
-                }
-                if (itemClass == null || !Form.class.isAssignableFrom(itemClass)) {
-                    action.consume();
-                    return;
-                }
-                if (itemClass == null || !Form.class.isAssignableFrom(itemClass)) {
-                    action.consume();
-                    return;
-                }
+        simpleMenuOption.addMenuEvent((action, index) -> {
+            System.out.println("Drawer menu selected " + Arrays.toString(index));
+            Class<?> itemClass = action.getItem().getItemClass();
+            int i = index[0];
+            if (i == 5) {
+                action.consume();
+                FormManager.showAbout();
+                return;
+            } else if (i == 6) {
+                action.consume();
+                FormManager.logout();
+                return;
+            }
+            if (itemClass != null && Form.class.isAssignableFrom(itemClass)) {
+                @SuppressWarnings("unchecked")
                 Class<? extends Form> formClass = (Class<? extends Form>) itemClass;
                 FormManager.showForm(AllForms.getForm(formClass));
+            } else {
+                action.consume();
             }
         });
 
@@ -188,8 +172,7 @@ public class MyDrawerBuilder extends SimpleDrawerBuilder {
     }
 
     private static String getDrawerBackgroundStyle() {
-        return "" +
-                "[light]background:tint($Panel.background,20%);" +
+        return "[light]background:tint($Panel.background,20%);" +
                 "[dark]background:tint($Panel.background,5%);";
     }
 }

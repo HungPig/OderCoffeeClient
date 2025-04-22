@@ -15,12 +15,11 @@ import raven.extras.AvatarIcon;
 
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class SampleData {
+
+
 
     public static List<ModelEmployee> getSampleEmployeeData(boolean defaultIcon) {
         List<ModelEmployee> list = new ArrayList<>();
@@ -35,7 +34,6 @@ public class SampleData {
         list.add(new ModelEmployee("20-June-2024", 1550, "UX/UI Designer", "Design thinker focused on creating intuitive user experiences.", new ModelProfile(getProfileIcon("profile_9.jpg", defaultIcon), "Daniel Wilson", "Austin")));
         return list;
     }
-
     public static List<ModelEmployee> getSampleBasicEmployeeData() {
         List<ModelEmployee> list = new ArrayList<>();
         list.add(new ModelEmployee("20-August-2024", 1750, "Business Analyst", "Analytical thinker with experience in business process improvement.", new ModelProfile(null, "Hannah Scott", "Washington, D.C.")));
@@ -60,6 +58,9 @@ public class SampleData {
         list.add(new ModelEmployee("15-August-2024", 1450, "Financial Planner", "Certified financial planner with a client-centered approach.", new ModelProfile(null, "Justin White", "San Diego")));
         return list;
     }
+
+
+
 
     public static TableXYDataset getTimeSeriesDataset() {
         TimeTableXYDataset dataset = new TimeTableXYDataset();
@@ -455,9 +456,9 @@ public class SampleData {
 
     private static Icon getProfileIcon(String name, boolean defaultIcon) {
         if (defaultIcon) {
-            return new ImageIcon(SampleData.class.getResource("/raven/modal/demo/images/" + name));
+            return new ImageIcon(Objects.requireNonNull(SampleData.class.getResource("/Order/images/" + name)));
         } else {
-            AvatarIcon avatarIcon = new AvatarIcon(SampleData.class.getResource("/raven/modal/demo/images/" + name), 55, 55, 3f);
+            AvatarIcon avatarIcon = new AvatarIcon(SampleData.class.getResource("/Order/images/" + name), 55, 55, 3f);
             avatarIcon.setType(AvatarIcon.Type.MASK_SQUIRCLE);
             return avatarIcon;
         }
