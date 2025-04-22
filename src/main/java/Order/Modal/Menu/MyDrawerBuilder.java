@@ -5,6 +5,7 @@ import Order.Modal.System.AllForms;
 import Order.Modal.System.Form;
 import Order.Modal.System.FormManager;
 import Order.Modal.forms.FormDashboard;
+import Order.Modal.forms.FormProduct;
 import Order.Modal.forms.FormSetting;
 import com.formdev.flatlaf.FlatClientProperties;
 import raven.extras.AvatarIcon;
@@ -87,7 +88,7 @@ public class MyDrawerBuilder extends SimpleDrawerBuilder {
         MenuItem[] items = new MenuItem[]{
                 new Item.Label("MASTER DATA"),
                 new Item("Product", "forms.svg")
-                        .subMenu("ProductList")
+                        .subMenu("ProductList", FormProduct.class)
                         .subMenu("Categories"),
                 new Item.Label("MAIN MENU"),
                 new Item("Dashboard", "dashboard.svg",FormDashboard.class),

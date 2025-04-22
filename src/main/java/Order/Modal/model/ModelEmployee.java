@@ -1,5 +1,7 @@
 package Order.Modal.model;
 
+import Order.Modal.model.ModelProfile;
+
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 

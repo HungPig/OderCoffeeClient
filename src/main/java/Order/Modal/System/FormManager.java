@@ -1,6 +1,7 @@
 package Order.Modal.System;
 
 import Order.Modal.Auth.LoginForm;
+import Order.Modal.forms.FormDashboard;
 import Order.Modal.utils.UndoRedo;
 import Order.Modal.dashboard.About;
 import raven.modal.Drawer;
@@ -68,7 +69,7 @@ public class FormManager {
         Drawer.setVisible(true);
         frame.getContentPane().removeAll();
         frame.getContentPane().add(getMainForm());
-//        Drawer.setSelectedItemClass(FormDashboard.class);
+        Drawer.setSelectedItemClass(FormDashboard.class);
         frame.repaint();
         frame.revalidate();
     }
