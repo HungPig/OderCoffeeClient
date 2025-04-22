@@ -2,9 +2,7 @@ package Order.Modal.System;
 
 import Order.Modal.component.EmptyModalBorder;
 import Order.Modal.component.FormSearchPanel;
-import Order.Modal.forms.FormDashboard;
-import Order.Modal.forms.FormProduct;
-import Order.Modal.forms.FormSetting;
+import Order.Modal.forms.*;
 import Order.Modal.utils.SystemForm;
 import raven.modal.ModalDialog;
 import raven.modal.option.Location;
@@ -44,7 +42,10 @@ public class FormSearch {
         return new Class[]{
                 FormDashboard.class,
                 FormProduct.class,
-                FormSetting.class
+                FormSetting.class,
+                FormProduct.class,
+                FormCategory.class,
+                FormOrder.class
         };
     }
 
