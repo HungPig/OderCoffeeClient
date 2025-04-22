@@ -4,6 +4,7 @@ import Order.Modal.OrderMain;
 import Order.Modal.System.AllForms;
 import Order.Modal.System.Form;
 import Order.Modal.System.FormManager;
+import Order.Modal.forms.FormCategory;
 import Order.Modal.forms.FormDashboard;
 import Order.Modal.forms.FormProduct;
 import Order.Modal.forms.FormSetting;
@@ -89,7 +90,7 @@ public class MyDrawerBuilder extends SimpleDrawerBuilder {
                 new Item.Label("MASTER DATA"),
                 new Item("Product", "forms.svg")
                         .subMenu("ProductList", FormProduct.class)
-                        .subMenu("Categories"),
+                        .subMenu("Categories", FormCategory.class),
                 new Item.Label("MAIN MENU"),
                 new Item("Dashboard", "dashboard.svg",FormDashboard.class),
                 new Item("Orders", "components.svg"),
