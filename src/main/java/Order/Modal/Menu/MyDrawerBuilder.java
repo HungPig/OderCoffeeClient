@@ -4,10 +4,7 @@ import Order.Modal.OrderMain;
 import Order.Modal.System.AllForms;
 import Order.Modal.System.Form;
 import Order.Modal.System.FormManager;
-import Order.Modal.forms.FormCategory;
-import Order.Modal.forms.FormDashboard;
-import Order.Modal.forms.FormProduct;
-import Order.Modal.forms.FormSetting;
+import Order.Modal.forms.*;
 import com.formdev.flatlaf.FlatClientProperties;
 import raven.extras.AvatarIcon;
 import raven.modal.drawer.DrawerPanel;
@@ -93,7 +90,7 @@ public class MyDrawerBuilder extends SimpleDrawerBuilder {
                         .subMenu("Categories", FormCategory.class),
                 new Item.Label("MAIN MENU"),
                 new Item("Dashboard", "dashboard.svg",FormDashboard.class),
-                new Item("Orders", "components.svg"),
+                new Item("Orders", "components.svg", FormOrder.class),
                 new Item("Customers", "email.svg"),
                 new Item("Setting", "setting.svg", FormSetting.class),
                 new Item.Label("OTHER"),
