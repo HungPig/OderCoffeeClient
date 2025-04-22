@@ -16,8 +16,6 @@ import com.formdev.flatlaf.extras.FlatSVGIcon;
 import com.formdev.flatlaf.util.UIScale;
 import net.miginfocom.swing.MigLayout;
 import org.jfree.chart.renderer.xy.CandlestickRenderer;
-
-
 import javax.swing.*;
 import java.awt.*;
 
@@ -150,7 +148,6 @@ public class FormDashboard extends Form {
 
     private JPanel panelLayout;
     private CardBox cardBox;
-
     private TimeSeriesChart timeSeriesChart;
     private CandlestickChart candlestickChart;
     private BarChart barChart;
