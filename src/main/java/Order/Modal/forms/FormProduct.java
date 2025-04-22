@@ -26,26 +26,28 @@ public class FormProduct extends Form {
     private DefaultTableModel model;
     public FormProduct() {
         init();
-
     }
 
     private void init() {
         setLayout(new MigLayout("fillx,wrap,insets 10 0 10 0", "[fill]", "[][]0[fill,grow]"));
         // create table model
-        Object columns[] = new Object[]{"SELECT", "#", "NAME", "PRICE", "STATUS", "DESCRIPTION", "ACTION"};
-        model = new DefaultTableModel(columns, 0) {
+        Object columns[] = new Object[]{
+                "Hung", // 0
+                "#", // 1
+                "NAME",
+                "STATUS",
+                "PRICE",
+                "DESCRIPTION",
+                "ACTION"};
+        DefaultTableModel model = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                // allow cell editable at column 0 for checkbox
-                return column == 0;
+                return column == 6; // only action column is editable
             }
 
             @Override
             public Class<?> getColumnClass(int columnIndex) {
                 // use boolean type at column 0 for checkbox
-                if (columnIndex == 0)
-                    return Boolean.class;
-                // use profile class
                 if (columnIndex == 2) {
                     return ModelProfile.class;
                 }
@@ -53,36 +55,36 @@ public class FormProduct extends Form {
             }
         };
 
+
+
         // create table
-        table = new JTable(model);
+        JTable table = new JTable(model);
 
         // table scroll
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
-
         TableActionEvent event = new TableActionEvent() {
             @Override
-            public void onEdit(int row) {
-                System.out.println("Edit row : " + row);
+            public void onEdit() {
+                showModal();
             }
 
             @Override
             public void onDelete(int row) {
-                if (table.isEditing()) {
-                    table.getCellEditor().stopCellEditing();
-                }
-                DefaultTableModel model = (DefaultTableModel) table.getModel();
-                model.removeRow(row);
+                System.out.println("Delete " + row);
             }
         };
         // table option
-        table.getColumnModel().getColumn(0).setMaxWidth(50);
+        table.getColumnModel().getColumn(0).setMinWidth(0);
+        table.getColumnModel().getColumn(0).setMaxWidth(0);
+        table.getColumnModel().getColumn(0).setPreferredWidth(0);
+        table.getColumnModel().getColumn(0).setResizable(false);
+        table.getColumnModel().getColumn(1).setMinWidth(50);
         table.getColumnModel().getColumn(1).setMaxWidth(50);
-        table.getColumnModel().getColumn(2).setPreferredWidth(150);
-        table.getColumnModel().getColumn(5).setPreferredWidth(100);
+        table.getColumnModel().getColumn(2).setPreferredWidth(100);
+        table.getColumnModel().getColumn(5).setPreferredWidth(250);
         table.getColumnModel().getColumn(6).setCellRenderer(new TableActionCellRender());
         table.getColumnModel().getColumn(6).setCellEditor(new TableActionCellEditor(event));
-
         // disable reordering table column
         table.getTableHeader().setReorderingAllowed(false);
 
@@ -90,7 +92,7 @@ public class FormProduct extends Form {
         table.setDefaultRenderer(ModelProfile.class, new TableProfileCellRenderer(table));
 
         // apply checkbox custom to table header
-        table.getColumnModel().getColumn(0).setHeaderRenderer(new CheckBoxTableHeaderRenderer(table, 0));
+        //table.getColumnModel().getColumn(0).setHeaderRenderer(new CheckBoxTableHeaderRenderer(table, 0));
 
         // alignment table header
         table.getTableHeader().setDefaultRenderer(new TableHeaderAlignment(table) {
@@ -127,7 +129,7 @@ public class FormProduct extends Form {
                 "background:$Table.background;");
 
         // create title
-        JLabel title = new JLabel("Product");
+        JLabel title = new JLabel("Custom table");
         title.putClientProperty(FlatClientProperties.STYLE, "" +
                 "font:bold +2");
         add(title, "gapx 20");
@@ -142,6 +144,7 @@ public class FormProduct extends Form {
         }
     }
 
+
     private Component createHeaderAction() {
         JPanel panel = new JPanel(new MigLayout("insets 5 20 5 20", "[fill,230]push[][]"));
 
@@ -149,14 +152,10 @@ public class FormProduct extends Form {
         txtSearch.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Search...");
         txtSearch.putClientProperty(FlatClientProperties.TEXT_FIELD_LEADING_ICON, new FlatSVGIcon("Order/icons/search.svg", 0.4f));
         JButton cmdCreate = new JButton("Create");
-        JButton cmdEdit = new JButton("Edit");
-        JButton cmdDelete = new JButton("Delete");
 
         cmdCreate.addActionListener(e -> showModal());
         panel.add(txtSearch);
         panel.add(cmdCreate);
-        panel.add(cmdEdit);
-        panel.add(cmdDelete);
 
         panel.putClientProperty(FlatClientProperties.STYLE, "" +
                 "background:null;");

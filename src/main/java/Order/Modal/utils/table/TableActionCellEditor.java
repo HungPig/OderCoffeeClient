@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class TableActionCellEditor extends DefaultCellEditor {
+
     private TableActionEvent event;
 
     public TableActionCellEditor(TableActionEvent event) {
