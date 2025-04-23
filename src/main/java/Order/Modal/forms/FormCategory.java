@@ -1,5 +1,9 @@
 package Order.Modal.forms;
 
+import Order.Modal.Api.APIClient;
+import Order.Modal.Api.CategoryAPI;
+import Order.Modal.Entity.categories;
+import Order.Modal.Response.CategoryResponse;
 import Order.Modal.System.Form;
 import Order.Modal.model.ModelEmployee;
 import Order.Modal.sample.SampleData;
@@ -16,10 +20,14 @@ import raven.modal.ModalDialog;
 import raven.modal.component.SimpleModalBorder;
 import raven.modal.option.Location;
 import raven.modal.option.Option;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.List;
 
 @SystemForm(name = "Category", description = "Category form display some details")
 public class FormCategory extends Form {
@@ -28,6 +36,45 @@ public class FormCategory extends Form {
 
     public FormCategory() {
         init();
+        loadData();
+    }
+    public void loadData() {
+        try {
+            CategoryAPI categoryAPI = APIClient.getClient().create(CategoryAPI.class);
+            categoryAPI.getAllCategories().enqueue(new Callback<CategoryResponse>() {
+                @Override
+                public void onResponse(Call<CategoryResponse> call, Response<CategoryResponse> response) {
+                    if (response.isSuccessful()) {
+                        DefaultTableModel model = (DefaultTableModel) table.getModel();
+                        model.setRowCount(0);
+                        assert response.body() != null;
+                        for (categories category : response.body().getData()) {
+                            model.addRow(new Object[]{
+                                    category.getId(),
+                                    category.getName()
+                            });
+                        }
+                        table.setModel(model);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<CategoryResponse> call, Throwable throwable) {
+                    JOptionPane.showMessageDialog(FormCategory.this,
+                            "Lỗi kết nối API: " + throwable.getMessage(),
+                            "Lỗi",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void formRefresh()
+    {
+        loadData();
     }
 
     private void init() {
@@ -112,9 +159,9 @@ public class FormCategory extends Form {
         add(scrollPane);
 
         // sample data
-        for (ModelEmployee d : SampleData.getSampleBasicEmployeeData()) {
-            model.addRow(d.toTableRowBasic(table.getRowCount() + 1));
-        }
+//        for (ModelEmployee d : SampleData.getSampleBasicEmployeeData()) {
+//            model.addRow(d.toTableRowBasic(table.getRowCount() + 1));
+//        }
     }
     private Component createHeaderAction() {
         JPanel panel = new JPanel(new MigLayout("insets 5 20 5 20", "[fill,230]push[][]"));
