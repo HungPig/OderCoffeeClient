@@ -1,4 +1,4 @@
-package Order.Modal.Utils;
+package Order.Modal.utils;
 
 import Order.Modal.themes.PanelThemes;
 import com.formdev.flatlaf.FlatLightLaf;

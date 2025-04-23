@@ -1,5 +1,5 @@
 package Order.Modal.themes;
-import Order.Modal.Utils.DemoPreferences;
+import Order.Modal.utils.DemoPreferences;
 import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.IntelliJTheme;
 import com.formdev.flatlaf.extras.FlatAnimatedLafChange;

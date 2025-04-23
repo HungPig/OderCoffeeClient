@@ -5,6 +5,7 @@ import Order.Modal.System.AllForms;
 import Order.Modal.System.Form;
 import Order.Modal.System.FormManager;
 import Order.Modal.forms.FormDashboard;
+import Order.Modal.forms.FormSetting;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import raven.extras.AvatarIcon;
@@ -25,6 +26,8 @@ import raven.modal.option.Option;
 import javax.swing.*;
 import java.awt.*;
 import java.util.Arrays;
+
+import static Order.Modal.System.FormManager.showAbout;
 
 public class MyDrawerBuilder extends SimpleDrawerBuilder {
 
@@ -91,9 +94,14 @@ public class MyDrawerBuilder extends SimpleDrawerBuilder {
                         .subMenu("Categories"),
                 new Item.Label("MAIN MENU"),
                 new Item("Dashboard", "forms.svg",FormDashboard.class),
+                new Item("Product", "forms.svg")
+                        .subMenu("ProductList")
+                        .subMenu("Categories"),
+                new Item.Label("MAIN MENU"),
+                new Item("Dashboard", "dashboard.svg"),
                 new Item("Orders", "components.svg"),
                 new Item("Customers", "email.svg"),
-                new Item("Reports", "chat.svg"),
+                new Item("Setting", "setting.svg", FormSetting.class),
                 new Item.Label("OTHER"),
                 new Item("About", "about.svg"),
                 new Item("Logout", "logout.svg")
@@ -125,13 +133,17 @@ public class MyDrawerBuilder extends SimpleDrawerBuilder {
                 System.out.println("Drawer menu selected " + Arrays.toString(index));
                 Class<?> itemClass = action.getItem().getItemClass();
                 int i = index[0];
-                if (i == 8) {
+                if (i == 5) {
                     action.consume();
-                    //FormManager.showAbout();
+                    FormManager.showAbout();
                     return;
-                } else if (i == 9) {
+                } else if (i == 6) {
                     action.consume();
-                    //FormManager.logout();
+                    FormManager.logout();
+                    return;
+                }
+                if (itemClass == null || !Form.class.isAssignableFrom(itemClass)) {
+                    action.consume();
                     return;
                 }
                 if (itemClass == null || !Form.class.isAssignableFrom(itemClass)) {

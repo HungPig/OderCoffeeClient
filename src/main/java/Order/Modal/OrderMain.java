@@ -2,7 +2,7 @@ package Order.Modal;
 
 
 import Order.Modal.System.FormManager;
-import Order.Modal.Utils.DemoPreferences;
+import Order.Modal.utils.DemoPreferences;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.fonts.roboto.FlatRobotoFont;
