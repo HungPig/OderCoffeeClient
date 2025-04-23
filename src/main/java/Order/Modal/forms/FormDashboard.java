@@ -1,7 +1,7 @@
 package Order.Modal.forms;
 
 import Order.Modal.System.Form;
-import Order.Modal.Utils.SystemForm;
+import Order.Modal.utils.SystemForm;
 import Order.Modal.component.Chart.*;
 import Order.Modal.component.Chart.Themes.ColorThemes;
 import Order.Modal.component.Chart.Themes.DefaultChartTheme;
@@ -51,7 +51,10 @@ public class FormDashboard extends Form {
         cardBox.setValueAt(1, "$52,420.55", "less then previous month", "-5%", false);
         cardBox.setValueAt(2, "$3,180.00", "more then previous month", "+12%", true);
         cardBox.setValueAt(3, "$49,240.55", "more then previous month", "+7%", true);
-
+//        main\java\Order\Modal\forms\FormDashboard.java:4:25
+//        java: cannot access Order.Modal.Utils.SystemForm
+//        bad class file: /C:/Users/admin/IdeaProjects/OderCoffeeClient/target/classes/Order/Modal/Utils/SystemForm.class
+//        class file contains wrong class
         // load data chart
         timeSeriesChart.setDataset(SampleData.getTimeSeriesDataset());
         candlestickChart.setDataset(SampleData.getOhlcDataset());
