@@ -3,16 +3,23 @@ package Order.Modal.forms;
 import Order.Modal.System.Form;
 import Order.Modal.model.ModelEmployee;
 import Order.Modal.sample.SampleData;
+import Order.Modal.simple.SimpleInputForms;
 import Order.Modal.utils.SystemForm;
 import Order.Modal.utils.table.Action.TableActionEvent;
 import Order.Modal.utils.table.TableActionCellEditor;
 import Order.Modal.utils.table.TableActionCellRender;
 import Order.Modal.utils.table.TableHeaderAlignment;
 import com.formdev.flatlaf.FlatClientProperties;
+import com.formdev.flatlaf.extras.FlatSVGIcon;
 import net.miginfocom.swing.MigLayout;
+import raven.modal.ModalDialog;
+import raven.modal.component.SimpleModalBorder;
+import raven.modal.option.Location;
+import raven.modal.option.Option;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.awt.*;
 
 @SystemForm(name = "Category", description = "Category form display some details")
 public class FormCategory extends Form {
@@ -24,7 +31,9 @@ public class FormCategory extends Form {
     }
 
     private void init() {
-        setLayout(new MigLayout("fillx,wrap,insets 10 0 10 0", "[fill]", "[]0[fill,grow]"));
+        setLayout(new MigLayout("fillx,wrap,insets 20 0 10 0", "[fill]", "[]20[]20[fill,grow]"));
+
+
         TableActionEvent event = new TableActionEvent() {
             @Override
             public void onEdit() {
@@ -48,6 +57,7 @@ public class FormCategory extends Form {
 
         // create table
         table = new JTable(model);
+        //table header
 
         // table scroll
         JScrollPane scrollPane = new JScrollPane(table);
@@ -55,6 +65,7 @@ public class FormCategory extends Form {
         // table option
         table.getColumnModel().getColumn(0).setMaxWidth(50);
         table.getColumnModel().getColumn(1).setPreferredWidth(100);
+        table.getColumnModel().getColumn(2).setMaxWidth(200);
         table.getColumnModel().getColumn(2).setCellRenderer(new TableActionCellRender());
         table.getColumnModel().getColumn(2).setCellEditor(new TableActionCellEditor(event));
 
@@ -70,13 +81,16 @@ public class FormCategory extends Form {
         });
 
         // style
-        putClientProperty(FlatClientProperties.STYLE, "arc:20;" +
+        putClientProperty(FlatClientProperties.STYLE,
+                "arc:20;" +
                 "background:$Table.background;");
-        table.getTableHeader().putClientProperty(FlatClientProperties.STYLE, "height:65;" +
+        table.getTableHeader().putClientProperty(FlatClientProperties.STYLE, "" +
+                "height:30;" +
                 "hoverBackground:null;" +
                 "pressedBackground:null;" +
                 "separatorColor:$TableHeader.background;");
-        table.putClientProperty(FlatClientProperties.STYLE, "rowHeight:65;" +
+        table.putClientProperty(FlatClientProperties.STYLE, "" +
+                "rowHeight:70;" +
                 "showHorizontalLines:true;" +
                 "intercellSpacing:0,1;" +
                 "cellFocusColor:$TableHeader.hoverBackground;" +
@@ -93,12 +107,41 @@ public class FormCategory extends Form {
         JLabel title = new JLabel("Category table");
         title.putClientProperty(FlatClientProperties.STYLE, "" +
                 "font:bold +2");
-        add(title, "gapx 20");
+        add(title, "gapx 20, wrap");
+        add(createHeaderAction(), "wrap");
         add(scrollPane);
 
         // sample data
         for (ModelEmployee d : SampleData.getSampleBasicEmployeeData()) {
             model.addRow(d.toTableRowBasic(table.getRowCount() + 1));
         }
+    }
+    private Component createHeaderAction() {
+        JPanel panel = new JPanel(new MigLayout("insets 5 20 5 20", "[fill,230]push[][]"));
+
+        JTextField txtSearch = new JTextField();
+        txtSearch.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Search...");
+        txtSearch.putClientProperty(FlatClientProperties.TEXT_FIELD_LEADING_ICON, new FlatSVGIcon("Order/icons/search.svg", 0.4f));
+        JButton cmdCreate = new JButton("Create");
+
+        cmdCreate.addActionListener(e -> showModal());
+        panel.add(txtSearch);
+        panel.add(cmdCreate);
+
+        panel.putClientProperty(FlatClientProperties.STYLE, "" +
+                "background:null;");
+        return panel;
+    }
+
+    private void showModal() {
+        Option option = ModalDialog.createOption();
+        option.getLayoutOption().setSize(-1, 1f)
+                .setLocation(Location.TRAILING, Location.TOP)
+                .setAnimateDistance(0.7f, 0);
+        ModalDialog.showModal(this, new SimpleModalBorder(
+                new SimpleInputForms(), "Create", SimpleModalBorder.YES_NO_OPTION,
+                (controller, action) -> {
+
+                }), option);
     }
 }

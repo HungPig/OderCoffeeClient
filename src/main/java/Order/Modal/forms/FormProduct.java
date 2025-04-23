@@ -83,6 +83,8 @@ public class FormProduct extends Form {
         table.getColumnModel().getColumn(1).setMaxWidth(50);
         table.getColumnModel().getColumn(2).setPreferredWidth(100);
         table.getColumnModel().getColumn(5).setPreferredWidth(250);
+        table.getColumnModel().getColumn(6).setMaxWidth(200);
+        table.getColumnModel().getColumn(6).setResizable(false);
         table.getColumnModel().getColumn(6).setCellRenderer(new TableActionCellRender());
         table.getColumnModel().getColumn(6).setCellEditor(new TableActionCellEditor(event));
         // disable reordering table column
