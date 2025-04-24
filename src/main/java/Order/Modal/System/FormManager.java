@@ -1,8 +1,12 @@
 package Order.Modal.System;
 
-import Order.Modal.Auth.Login;
-import Order.Modal.Utils.UndoRedo;
+import Order.Modal.Auth.LoginForm;
+import Order.Modal.forms.FormDashboard;
+import Order.Modal.utils.UndoRedo;
+import Order.Modal.dashboard.About;
 import raven.modal.Drawer;
+import raven.modal.ModalDialog;
+import raven.modal.component.SimpleModalBorder;
 
 
 import javax.swing.*;
@@ -12,7 +16,7 @@ public class FormManager {
     protected static final UndoRedo<Form> FORMS = new UndoRedo<>();
     private static JFrame frame;
     private static MainForm mainForm;
-    private static Login login;
+    private static LoginForm login;
 
     public static void install(JFrame f) {
         frame = f;
@@ -65,7 +69,7 @@ public class FormManager {
         Drawer.setVisible(true);
         frame.getContentPane().removeAll();
         frame.getContentPane().add(getMainForm());
-//        Drawer.setSelectedItemClass(FormDashboard.class);
+        Drawer.setSelectedItemClass(FormDashboard.class);
         frame.repaint();
         frame.revalidate();
     }
@@ -73,7 +77,7 @@ public class FormManager {
     public static void logout() {
         Drawer.setVisible(false);
         frame.getContentPane().removeAll();
-        Login form = getLogin();
+        LoginForm form = getLogin();
         form.formCheck();
         frame.getContentPane().add(login);
         FORMS.clear();
@@ -92,16 +96,15 @@ public class FormManager {
         return mainForm;
     }
 
-    private static Login getLogin() {
+    private static LoginForm getLogin() {
         if (login == null) {
-            login = new Login();
+            login = new LoginForm();
         }
         return login;
     }
-
-//    public static void showAbout() {
-//        ModalDialog.showModal(frame, new SimpleModalBorder(new About(), "About"),
-//                ModalDialog.createOption().setAnimationEnabled(false)
-//        );
-//    }
+    public static void showAbout() {
+        ModalDialog.showModal(frame, new SimpleModalBorder(new About(), "About"),
+                ModalDialog.createOption().setAnimationEnabled(false)
+        );
+    }
 }

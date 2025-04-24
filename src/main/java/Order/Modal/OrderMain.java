@@ -2,7 +2,7 @@ package Order.Modal;
 
 
 import Order.Modal.System.FormManager;
-import Order.Modal.Utils.DemoPreferences;
+import Order.Modal.utils.DemoPreferences;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.fonts.roboto.FlatRobotoFont;
@@ -32,7 +32,7 @@ public class OrderMain extends javax.swing.JFrame {
     public static void main(String[] args) {
         DemoPreferences.init();
         FlatRobotoFont.install();
-        FlatLaf.registerCustomDefaultsSource("raven.modal.demo.themes");
+        FlatLaf.registerCustomDefaultsSource("Order.themes");
         UIManager.put("defaultFont", new Font(FlatRobotoFont.FAMILY, Font.PLAIN, 13));
         DemoPreferences.setupLaf();
         EventQueue.invokeLater(() -> new OrderMain().setVisible(true));

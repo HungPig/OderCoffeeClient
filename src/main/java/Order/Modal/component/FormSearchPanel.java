@@ -3,8 +3,8 @@ package Order.Modal.component;
 import Order.Modal.System.Form;
 import Order.Modal.System.FormSearch;
 import Order.Modal.icons.SVGIconUIColor;
-import Order.Modal.Utils.DemoPreferences;
-import Order.Modal.Utils.SystemForm;
+import Order.Modal.utils.DemoPreferences;
+import Order.Modal.utils.SystemForm;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import com.formdev.flatlaf.icons.FlatMenuArrowIcon;
@@ -45,7 +45,7 @@ public class FormSearchPanel extends JPanel {
         textSearch = new JTextField();
         panelResult = new JPanel(new MigLayout("insets 3 10 3 10,fillx,wrap", "[fill]"));
         textSearch.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Search...");
-        textSearch.putClientProperty(FlatClientProperties.TEXT_FIELD_LEADING_ICON, new FlatSVGIcon("raven/modal/demo/icons/search.svg", 0.4f));
+        textSearch.putClientProperty(FlatClientProperties.TEXT_FIELD_LEADING_ICON, new FlatSVGIcon("Order/icons/search.svg", 0.4f));
         textSearch.putClientProperty(FlatClientProperties.STYLE, "" +
                 "border:3,3,3,3;" +
                 "background:null;" +
@@ -389,7 +389,7 @@ public class FormSearchPanel extends JPanel {
         }
 
         private JButton createButton(String name, String icon, float scale, String hoverKey, float alpha) {
-            SVGIconUIColor svgIcon = new SVGIconUIColor("raven/modal/demo/icons/" + icon, scale, "Label.disabledForeground", alpha);
+            SVGIconUIColor svgIcon = new SVGIconUIColor("Order/icons/" + icon, scale, "Label.disabledForeground", alpha);
             JButton button = new JButton(svgIcon);
             button.setName(name);
             button.setFocusable(false);
