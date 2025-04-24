@@ -4,10 +4,12 @@ import Order.Modal.Api.APIClient;
 import Order.Modal.Api.CategoryAPI;
 import Order.Modal.Entity.categories;
 import Order.Modal.Response.CategoryResponse;
+import Order.Modal.Response.CreateCategoryResponse;
 import Order.Modal.System.Form;
 import Order.Modal.model.ModelEmployee;
 import Order.Modal.sample.SampleData;
 import Order.Modal.simple.SimpleInputForms;
+import Order.Modal.simple.inputFormCate;
 import Order.Modal.utils.SystemForm;
 import Order.Modal.utils.table.Action.TableActionEvent;
 import Order.Modal.utils.table.TableActionCellEditor;
@@ -33,11 +35,13 @@ import java.util.List;
 public class FormCategory extends Form {
     private JTable table;
     private DefaultTableModel model;
+    inputFormCate input = new inputFormCate();
 
     public FormCategory() {
         init();
         loadData();
     }
+
     public void loadData() {
         try {
             CategoryAPI categoryAPI = APIClient.getClient().create(CategoryAPI.class);
@@ -72,8 +76,7 @@ public class FormCategory extends Form {
     }
 
     @Override
-    public void formRefresh()
-    {
+    public void formRefresh() {
         loadData();
     }
 
@@ -88,8 +91,29 @@ public class FormCategory extends Form {
             }
 
             @Override
-            public void onDelete(int row) {
-                System.out.println("Delete " + row);
+            public void onDelete() {
+                int result = JOptionPane.showConfirmDialog(null, "Confirm deletion", "Delete category", JOptionPane.YES_NO_OPTION);
+                if (result == JOptionPane.YES_OPTION) {
+                    categories category = new categories();
+                    int id = category.getId();
+                    CategoryAPI categoryAPI = APIClient.getClient().create(CategoryAPI.class);
+                    categoryAPI.deleteCategory(id).enqueue(new Callback<CategoryResponse>() {
+                        @Override
+                        public void onResponse(Call<CategoryResponse> call, Response<CategoryResponse> response) {
+                            if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                                JOptionPane.showMessageDialog(null, "Xoá thành công!");
+                                loadData(); // load lại danh sách
+                            } else {
+                                JOptionPane.showMessageDialog(null, "Xoá thất bại: " + response.message());
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<CategoryResponse> call, Throwable throwable) {
+                            JOptionPane.showMessageDialog(null, "Lỗi xoá: " + throwable.getMessage());
+                        }
+                    });
+                }
             }
         };
 
@@ -130,7 +154,7 @@ public class FormCategory extends Form {
         // style
         putClientProperty(FlatClientProperties.STYLE,
                 "arc:20;" +
-                "background:$Table.background;");
+                        "background:$Table.background;");
         table.getTableHeader().putClientProperty(FlatClientProperties.STYLE, "" +
                 "height:30;" +
                 "hoverBackground:null;" +
@@ -163,6 +187,7 @@ public class FormCategory extends Form {
 //            model.addRow(d.toTableRowBasic(table.getRowCount() + 1));
 //        }
     }
+
     private Component createHeaderAction() {
         JPanel panel = new JPanel(new MigLayout("insets 5 20 5 20", "[fill,230]push[][]"));
 
@@ -185,10 +210,37 @@ public class FormCategory extends Form {
         option.getLayoutOption().setSize(-1, 1f)
                 .setLocation(Location.TRAILING, Location.TOP)
                 .setAnimateDistance(0.7f, 0);
-        ModalDialog.showModal(this, new SimpleModalBorder(
-                new SimpleInputForms(), "Create", SimpleModalBorder.YES_NO_OPTION,
-                (controller, action) -> {
 
+
+        ModalDialog.showModal(this, new SimpleModalBorder(
+                input, "Add New Category", SimpleModalBorder.YES_NO_OPTION,
+                (controller, action) -> {
+                    if (action == SimpleModalBorder.YES_OPTION) {
+                        String name = input.getCategoryName();
+                        categories category = new categories();
+                        category.setName(name);
+
+                        CategoryAPI categoryAPI = APIClient.getClient().create(CategoryAPI.class);
+                        categoryAPI.addCategory(category).enqueue(new Callback<CreateCategoryResponse>() {
+
+                            @Override
+                            public void onResponse(Call<CreateCategoryResponse> call, Response<CreateCategoryResponse> response) {
+                                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                                    JOptionPane.showMessageDialog(FormCategory.this, "Tạo danh mục thành công!");
+                                    loadData();
+                                } else {
+                                    JOptionPane.showMessageDialog(FormCategory.this, "Tạo thất bại: " + response.message());
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<CreateCategoryResponse> call, Throwable throwable) {
+                                JOptionPane.showMessageDialog(FormCategory.this, "Lỗi kết nối: " + throwable.getMessage());
+                            }
+                        });
+
+                    }
                 }), option);
     }
+
 }

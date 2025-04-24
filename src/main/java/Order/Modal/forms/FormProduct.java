@@ -70,8 +70,8 @@ public class FormProduct extends Form {
             }
 
             @Override
-            public void onDelete(int row) {
-                System.out.println("Delete " + row);
+            public void onDelete() {
+                System.out.println("Delete ");
             }
         };
         // table option

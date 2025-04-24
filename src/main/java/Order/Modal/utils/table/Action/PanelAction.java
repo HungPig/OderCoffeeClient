@@ -17,7 +17,7 @@ public class PanelAction extends JPanel {
 
     public void initEvent(TableActionEvent event, int row) {
         cmdEdit.addActionListener(e -> event.onEdit());
-        cmdDelete.addActionListener(e -> event.onDelete(row));
+        cmdDelete.addActionListener(e -> event.onDelete());
     }
 
     private void initComponents() {
