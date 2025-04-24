@@ -84,8 +84,7 @@ public class FormCategory extends Form {
 
     private void init() {
         setLayout(new MigLayout("fillx,wrap,insets 20 0 10 0", "[fill]", "[]20[]20[fill,grow]"));
-
-
+        //Hi
         TableActionEvent event = new TableActionEvent() {
             @Override
             public void onEdit() {
