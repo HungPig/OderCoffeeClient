@@ -37,12 +37,41 @@ import java.util.List;
 public class FormCategory extends Form {
     private JTable table;
     private DefaultTableModel model;
-    inputFormCate input = new inputFormCate();
+    JTextField txtFieldID = new JTextField();
+    JTextField txtCategoryName = new JTextField();
 
     public FormCategory() {
         init();
         loadData();
     }
+
+    private Component inputForm() {
+        JPanel panel = new JPanel(new MigLayout("fillx,wrap,insets 5 30 5 30,width 400", "[fill]", ""));
+        // Initialize text fields
+
+        // Make ID field non-editable
+        txtFieldID.setEditable(false);
+
+        // style
+        txtCategoryName.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "e.g.Coffee");
+        txtFieldID.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "ID will be generated automatically");
+
+        // Create title
+        JLabel lb = new JLabel("Please complete the following categories to add data !");
+        lb.putClientProperty(FlatClientProperties.STYLE, "" + "font:+2");
+        panel.add(lb, "gapy 5 0");
+        panel.add(new JSeparator(), "height 2!,gapy 0 0");
+
+        // Add ID field
+        panel.add(new JLabel("ID"), "gapy 5 0");
+        panel.add(txtFieldID);
+
+        // Add Category name field
+        panel.add(new JLabel("Category name"), "gapy 5 0");
+        panel.add(txtCategoryName);
+        return panel;
+    }
+
 
     public void loadData() {
         try {
@@ -51,29 +80,32 @@ public class FormCategory extends Form {
                 @Override
                 public void onResponse(Call<CategoryResponse> call, Response<CategoryResponse> response) {
                     if (response.isSuccessful()) {
-                        DefaultTableModel model = (DefaultTableModel) table.getModel();
                         model.setRowCount(0);
-                        assert response.body() != null;
-                        for (categories category : response.body().getData()) {
+                        List<categories> categories = response.body().getData();
+                        for (categories category : categories) {
                             model.addRow(new Object[]{
                                     category.getId(),
                                     category.getName()
                             });
                         }
-                        table.setModel(model);
                     }
                 }
 
                 @Override
                 public void onFailure(Call<CategoryResponse> call, Throwable throwable) {
-                    JOptionPane.showMessageDialog(FormCategory.this,
-                            "Lỗi kết nối API: " + throwable.getMessage(),
-                            "Lỗi",
-                            JOptionPane.ERROR_MESSAGE);
+                    SwingUtilities.invokeLater(() -> {
+                        JOptionPane.showMessageDialog(FormCategory.this,
+                                "Lỗi kết nối API: " + throwable.getMessage(),
+                                "Lỗi",
+                                JOptionPane.ERROR_MESSAGE);
+                    });
                 }
             });
         } catch (Exception e) {
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(FormCategory.this,
+                    "Lỗi khởi tạo API: " + e.getMessage(),
+                    "Lỗi",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -88,60 +120,7 @@ public class FormCategory extends Form {
         TableActionEvent event = new TableActionEvent() {
             @Override
             public void onEdit() {
-                // Lấy thông tin hàng được chọn
-                int selectedRow = table.getSelectedRow();
-                if (selectedRow == -1) {
-                    JOptionPane.showMessageDialog(FormCategory.this, "Vui lòng chọn một danh mục để chỉnh sửa.");
-                    return;
-                }
 
-                // Lấy ID và tên danh mục hiện tại
-                int id = (int) table.getValueAt(selectedRow, 0);
-                String currentName = (String) table.getValueAt(selectedRow, 1);
-
-                // Hiển thị tên danh mục hiện tại trong input
-                input.getTxtCategoryName().setText(currentName);
-
-                // Tạo đối tượng Option cho modal
-                Option option = ModalDialog.createOption();
-                option.getLayoutOption().setSize(-1, 1f)
-                        .setLocation(Location.TRAILING, Location.TOP)
-                        .setAnimateDistance(0.7f, 0);
-
-                // Hiển thị modal để chỉnh sửa danh mục
-                ModalDialog.showModal(FormCategory.this, new SimpleModalBorder(
-                        input, "Chỉnh sửa danh mục", SimpleModalBorder.YES_NO_OPTION,
-                        (controller, action) -> {
-                            if (action == SimpleModalBorder.YES_OPTION) {
-                                // Lấy tên mới từ input
-                                String newName = input.getCategoryName();
-
-                                // Tạo đối tượng category mới
-                                categories category = new categories();
-                                category.setName(newName);
-
-                                // Gọi API cập nhật danh mục
-                                CategoryAPI categoryAPI = APIClient.getClient().create(CategoryAPI.class);
-                                categoryAPI.updateCategory(id, category).enqueue(new Callback<CreateCategoryResponse>() {
-                                    @Override
-                                    public void onResponse(Call<CreateCategoryResponse> call, Response<CreateCategoryResponse> response) {
-                                        if (response.isSuccessful()) {
-                                            // Cập nhật tên danh mục mới vào bảng
-                                            table.setValueAt(newName, selectedRow, 1);  // Cập nhật tên danh mục ở cột thứ 2
-                                            JOptionPane.showMessageDialog(FormCategory.this, "Cập nhật thành công!");
-                                            loadData();
-                                        } else {
-                                            JOptionPane.showMessageDialog(FormCategory.this, "Cập nhật thất bại: " + response.message());
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onFailure(Call<CreateCategoryResponse> call, Throwable throwable) {
-                                        JOptionPane.showMessageDialog(FormCategory.this, "Lỗi kết nối: " + throwable.getMessage());
-                                    }
-                                });
-                            }
-                        }), option);
             }
 
 
@@ -150,30 +129,58 @@ public class FormCategory extends Form {
                 int selectedRow = table.getSelectedRow();
                 if (selectedRow != -1) {
                     int result = JOptionPane.showConfirmDialog(FormCategory.this,
-                            "Confirm deletion", "Delete category", JOptionPane.YES_NO_OPTION);
-                    if (result == JOptionPane.YES_OPTION) {
-                        int id = (int) table.getValueAt(selectedRow, 0);
-                        CategoryAPI categoryAPI = APIClient.getClient().create(CategoryAPI.class);
-                        categoryAPI.deleteCategory(id).enqueue(new Callback<DeleteCategoryResponse>() {
-                            @Override
-                            public void onResponse(Call<DeleteCategoryResponse> call, Response<DeleteCategoryResponse> response) {
-                                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                                    JOptionPane.showMessageDialog(FormCategory.this, "Xoá thành công!");
-                                    loadData(); // Reload the list
-                                } else {
-                                    JOptionPane.showMessageDialog(FormCategory.this,
-                                            "Xoá thất bại: " + (response.body() != null ? response.body().getMessage() : response.message()));
-                                }
-                            }
+                            "Bạn có chắc chắn muốn xóa danh mục này?",
+                            "Xác nhận xóa",
+                            JOptionPane.YES_NO_OPTION);
 
-                            @Override
-                            public void onFailure(Call<DeleteCategoryResponse> call, Throwable throwable) {
-                                JOptionPane.showMessageDialog(FormCategory.this, "Lỗi xoá: " + throwable.getMessage());
-                            }
-                        });
+                    if (result == JOptionPane.YES_OPTION) {
+                        try {
+                            // Lấy ID từ cột đầu tiên (cột 0)
+                            int id = (int) table.getValueAt(selectedRow, 0);
+
+                            CategoryAPI categoryAPI = APIClient.getClient().create(CategoryAPI.class);
+                            categoryAPI.deleteCategory(id).enqueue(new Callback<DeleteCategoryResponse>() {
+                                @Override
+                                public void onResponse(Call<DeleteCategoryResponse> call, Response<DeleteCategoryResponse> response) {
+                                    if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                                        SwingUtilities.invokeLater(() -> {
+                                            loadData();
+                                            JOptionPane.showMessageDialog(FormCategory.this,
+                                                    "Xóa danh mục thành công!");
+                                        });
+                                    } else {
+                                        SwingUtilities.invokeLater(() -> {
+                                            JOptionPane.showMessageDialog(FormCategory.this,
+                                                    "Xóa thất bại: " + (response.body() != null ?
+                                                            response.body().getMessage() : response.message()),
+                                                    "Lỗi",
+                                                    JOptionPane.ERROR_MESSAGE);
+                                        });
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<DeleteCategoryResponse> call, Throwable throwable) {
+                                    SwingUtilities.invokeLater(() -> {
+                                        JOptionPane.showMessageDialog(FormCategory.this,
+                                                "Lỗi kết nối: " + throwable.getMessage(),
+                                                "Lỗi",
+                                                JOptionPane.ERROR_MESSAGE);
+                                    });
+                                }
+                            });
+                        } catch (Exception e) {
+                            JOptionPane.showMessageDialog(FormCategory.this,
+                                    "Có lỗi xảy ra: " + e.getMessage(),
+                                    "Lỗi",
+                                    JOptionPane.ERROR_MESSAGE);
+                        }
                     }
                 } else {
-                    JOptionPane.showMessageDialog(FormCategory.this, "Please select a category to delete");
+                    JOptionPane.showMessageDialog(FormCategory.this,
+                            "Vui lòng chọn một danh mục để xóa",
+                            "Thông báo",
+                            JOptionPane.INFORMATION_MESSAGE);
                 }
             }
         };
@@ -192,39 +199,26 @@ public class FormCategory extends Form {
         ;
 
         // create table
-        table = new
-
-                JTable(model);
+        table = new JTable(model);
         //table header
-
         // table scroll
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         // table option
         table.getColumnModel().
-
                 getColumn(0).
-
                 setMaxWidth(50);
         table.getColumnModel().
-
                 getColumn(1).
-
                 setPreferredWidth(100);
         table.getColumnModel().
-
                 getColumn(2).
-
                 setMaxWidth(200);
         table.getColumnModel().
-
                 getColumn(2).
-
                 setCellRenderer(new TableActionCellRender());
         table.getColumnModel().
-
                 getColumn(2).
-
                 setCellEditor(new TableActionCellEditor(event));
 
         // alignment table header
@@ -277,11 +271,6 @@ public class FormCategory extends Form {
         add(createHeaderAction(), "wrap");
 
         add(scrollPane);
-
-        // sample data
-//        for (ModelEmployee d : SampleData.getSampleBasicEmployeeData()) {
-//            model.addRow(d.toTableRowBasic(table.getRowCount() + 1));
-//        }
     }
 
     private Component createHeaderAction() {
@@ -309,16 +298,13 @@ public class FormCategory extends Form {
 
 
         ModalDialog.showModal(this, new SimpleModalBorder(
-                input, "Add New Category", SimpleModalBorder.YES_NO_OPTION,
-                (controller, action) -> {
+                inputForm(), "Add New Category", SimpleModalBorder.YES_NO_OPTION,
+                (controller, action) ->  {
                     if (action == SimpleModalBorder.YES_OPTION) {
-                        String name = input.getCategoryName();
                         categories category = new categories();
-                        category.setName(name);
-
+//                        category.setName(input.getTxtCategoryName().getText());
                         CategoryAPI categoryAPI = APIClient.getClient().create(CategoryAPI.class);
                         categoryAPI.addCategory(category).enqueue(new Callback<CreateCategoryResponse>() {
-
                             @Override
                             public void onResponse(Call<CreateCategoryResponse> call, Response<CreateCategoryResponse> response) {
                                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
