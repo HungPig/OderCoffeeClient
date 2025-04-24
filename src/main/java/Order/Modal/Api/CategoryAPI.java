@@ -3,6 +3,7 @@ package Order.Modal.Api;
 import Order.Modal.Entity.categories;
 import Order.Modal.Response.CategoryResponse;
 import Order.Modal.Response.CreateCategoryResponse;
+import Order.Modal.Response.DeleteCategoryResponse;
 import retrofit2.Call;
 import retrofit2.http.*;
 
@@ -14,5 +15,7 @@ public interface CategoryAPI {
     @POST("/api/category")
     Call<CreateCategoryResponse> addCategory(@Body categories category);
     @DELETE("/api/category/{id}")
-    Call<CategoryResponse> deleteCategory(@Path("id") int id);
+    Call<DeleteCategoryResponse> deleteCategory(@Path("id") int id);
+    @PATCH("/api/category/{id}")
+    Call<CreateCategoryResponse> updateCategory(@Path("id") int id, @Body categories category);
 }

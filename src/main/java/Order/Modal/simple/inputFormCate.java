@@ -34,8 +34,6 @@ public class inputFormCate extends JPanel {
         add(new JSeparator(), "height 2!,gapy 0 0");
     }
 
-
-
     public void formOpen() {
         txtCategoryName.grabFocus();
     }
@@ -43,6 +41,15 @@ public class inputFormCate extends JPanel {
     public String getCategoryName() {
         return txtCategoryName.getText().trim();
     }
+    public String getCategoryName(String name) {
+        return txtCategoryName.getText().trim();
+    }
 
+    public void setCategoryName(String name) {
+        txtCategoryName.setText(name);
+    }
+    public JTextField getTxtCategoryName() {
+        return txtCategoryName;
+    }
     private JTextField txtCategoryName;
 }
