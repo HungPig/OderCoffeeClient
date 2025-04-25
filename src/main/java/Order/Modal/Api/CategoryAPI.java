@@ -12,10 +12,13 @@ import java.util.List;
 public interface CategoryAPI {
     @GET("/api/category")
     Call<CategoryResponse> getAllCategories();
+    @GET("/api/category/{id}")
+    Call<CreateCategoryResponse> getCategoryId(@Path("id") String id);
     @POST("/api/category")
     Call<CreateCategoryResponse> addCategory(@Body categories category);
     @DELETE("/api/category/{id}")
-    Call<DeleteCategoryResponse> deleteCategory(@Path("id") int id);
+    Call<DeleteCategoryResponse> deleteCategory(@Path("id") String id);
     @PATCH("/api/category/{id}")
-    Call<CreateCategoryResponse> updateCategory(@Path("id") int id, @Body categories category);
+    Call<CreateCategoryResponse> updateCategory(@Path("id") String id, @Body categories category);
+
 }

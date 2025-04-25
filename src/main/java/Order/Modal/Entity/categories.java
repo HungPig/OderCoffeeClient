@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Setter
 public class categories implements Serializable {
     @SerializedName("id")
-    private int id;
+    private String id;
     @SerializedName("name")
     private String name;
 }

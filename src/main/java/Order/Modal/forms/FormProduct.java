@@ -22,8 +22,6 @@ import java.awt.*;
 
 @SystemForm(name = "Product", description = "Product table with advanced features", tags = {"list", "table"})
 public class FormProduct extends Form {
-    private JTable table;
-    private DefaultTableModel model;
     public FormProduct() {
         init();
     }
