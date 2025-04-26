@@ -336,6 +336,7 @@ public class FormSetting extends Form {
     }
 
     private JPanel createThemes() {
+        //HELLO WORD
         JPanel panel = new JPanel(new MigLayout("wrap,fill,insets 0", "[fill]", "[grow 0,fill]0[fill]"));
         final PanelThemes panelThemes = new PanelThemes();
         JPanel panelHeader = new JPanel(new MigLayout("fillx,insets 3", "[grow 0]push[]"));

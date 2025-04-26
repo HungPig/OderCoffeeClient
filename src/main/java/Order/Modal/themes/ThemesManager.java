@@ -10,6 +10,7 @@ import com.formdev.flatlaf.themes.FlatMacLightLaf;
 import com.formdev.flatlaf.util.LoggingFacade;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
@@ -34,9 +35,17 @@ public class ThemesManager {
 
         // load themes.json
         Map<String, Object> json;
-        try (Reader reader = new InputStreamReader(getClass().getResourceAsStream("/Order/themes/themes.json"), StandardCharsets.UTF_8)) {
+        InputStream inputStream = getClass().getResourceAsStream("/Order/themes/themes.json");
+
+        if (inputStream == null) {
+            System.err.println("❌ Không tìm thấy file themes.json tại /Order/themes/themes.json");
+            return;
+        }
+
+        try (Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
             json = (Map<String, Object>) Json.parse(reader);
         } catch (IOException e) {
+            System.err.println("❌ Lỗi khi đọc file themes.json: " + e.getMessage());
             LoggingFacade.INSTANCE.logSevere(null, e);
             return;
         }
