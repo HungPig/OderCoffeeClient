@@ -1,6 +1,6 @@
-# ViVu Chat - AI Chatbot Application
+# OrderCoffee - Application
 
-ViVu Chat is an AI-powered chatbot application that allows users to have interactive conversations with various large language models through the Ollama API. The application provides a user-friendly interface with features like chat history, thinking indicators, and model selection.
+An internal order management system where customers place drink orders , and the baristas (using a Java Swing desktop app) can view and update the order status in real-time
 
 ## Features
 
