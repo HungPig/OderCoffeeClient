@@ -3,6 +3,7 @@ package Order.Modal.forms;
 import Order.Modal.Api.APIClient;
 import Order.Modal.Api.CategoryAPI;
 import Order.Modal.Entity.categories;
+import Order.Modal.Response.ApiResponse;
 import Order.Modal.Response.CategoryResponse;
 import Order.Modal.Response.CreateCategoryResponse;
 import Order.Modal.Response.DeleteCategoryResponse;
@@ -29,6 +30,7 @@ import retrofit2.Response;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.List;
 
 @SystemForm(name = "Category", description = "Category form display some details")
 public class FormCategory extends Form {
@@ -36,12 +38,14 @@ public class FormCategory extends Form {
     private DefaultTableModel model;
     private JTextField txtFieldID;
     private JTextField txtFieldCategoryName;
+
     public FormCategory() {
         txtFieldID = new JTextField();
         txtFieldCategoryName = new JTextField();
         init();
         loadData();
     }
+
     public void loadData() {
         try {
             CategoryAPI categoryAPI = APIClient.getClient().create(CategoryAPI.class);
@@ -76,8 +80,11 @@ public class FormCategory extends Form {
         }
     }
 
-    public Component inputCate()
-    {
+    private void loadAll() {
+
+    }
+
+    public Component inputCate() {
         JPanel panel = new JPanel(new MigLayout("fillx,wrap,insets 5 30 5 30,width 400", "[fill]", ""));
         if (txtFieldID == null) txtFieldID = new JTextField();
         if (txtFieldCategoryName == null) txtFieldCategoryName = new JTextField();
@@ -120,7 +127,7 @@ public class FormCategory extends Form {
                 int changedRow = e.getFirstRow();
                 for (int i = 0; i < table.getRowCount(); i++) {
                     if (i != changedRow && (Boolean) table.getValueAt(i, 0)) {
-                        table.setValueAt(false, i, 0); // bỏ chọn các hàng khác
+                        table.setValueAt(false, i, 0);
                     }
                 }
             }
@@ -203,6 +210,14 @@ public class FormCategory extends Form {
         cmdCreate.addActionListener(e -> Create());
         cmdEdit.addActionListener(e -> Edit());
         cmdDelete.addActionListener(e -> Delete());
+        txtSearch.addActionListener(e -> {
+            String keyword = txtSearch.getText().trim();
+            if (keyword.isEmpty()) {
+                loadData();
+            } else {
+                searchCategories(keyword);
+            }
+        });
         panel.add(txtSearch);
         panel.add(cmdCreate);
         panel.add(cmdEdit);
@@ -213,8 +228,44 @@ public class FormCategory extends Form {
         return panel;
     }
 
-    private void Delete()
-    {
+
+
+
+    private void searchCategories(String keyword) {
+        CategoryAPI categoryAPI = APIClient.getClient().create(CategoryAPI.class);
+        categoryAPI.getCategoriesBySearch(keyword).enqueue(new Callback<ApiResponse<List<categories>>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<List<categories>>> call, Response<ApiResponse<List<categories>>> response) {
+                if (response.isSuccessful()) {
+                    ApiResponse<List<categories>> apiResponse = response.body();
+                    List<categories> categoriesList = apiResponse != null ? apiResponse.getData() : null;
+                    SwingUtilities.invokeLater(() -> {
+                        DefaultTableModel model = (DefaultTableModel) table.getModel();
+                        model.setRowCount(0);
+                        if (categoriesList != null) {
+                            for (categories category : categoriesList) {
+                                model.addRow(new Object[]{
+                                        false,
+                                        category.getId(),
+                                        category.getName()
+                                });
+                            }
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<List<categories>>> call, Throwable throwable) {
+                JOptionPane.showMessageDialog(FormCategory.this,
+                        "Lỗi khi tìm kiếm: " + throwable.getMessage(),
+                        "Lỗi",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        });
+    }
+
+    private void Delete() {
         int selectedRow = -1;
         for (int i = 0; i < table.getRowCount(); i++) {
             Boolean isChecked = (Boolean) table.getValueAt(i, 0);
@@ -235,8 +286,7 @@ public class FormCategory extends Form {
             categoryAPI.deleteCategory(categoryId).enqueue(new Callback<DeleteCategoryResponse>() {
                 @Override
                 public void onResponse(Call<DeleteCategoryResponse> call, Response<DeleteCategoryResponse> response) {
-                    if(response.isSuccessful())
-                    {
+                    if (response.isSuccessful()) {
                         loadData();
                     }
                 }
@@ -320,7 +370,7 @@ public class FormCategory extends Form {
                 inputCate(), "Create Category", SimpleModalBorder.YES_NO_OPTION,
 
                 (controller, action) -> {
-                    if(action == SimpleModalBorder.YES_OPTION) {
+                    if (action == SimpleModalBorder.YES_OPTION) {
                         categories category = new categories();
                         category.setId(txtFieldID.getText());
                         category.setName(txtFieldCategoryName.getText());
@@ -328,13 +378,14 @@ public class FormCategory extends Form {
                         categoryAPI.addCategory(category).enqueue(new Callback<CreateCategoryResponse>() {
                             @Override
                             public void onResponse(Call<CreateCategoryResponse> call, Response<CreateCategoryResponse> response) {
-                                if(response.isSuccessful()) {
+                                if (response.isSuccessful()) {
                                     JOptionPane.showMessageDialog(null, "Category created successfully");
                                     txtFieldID.setText("");
                                     txtFieldCategoryName.setText("");
                                     loadData();
                                 }
                             }
+
                             @Override
                             public void onFailure(Call<CreateCategoryResponse> call, Throwable throwable) {
                                 JOptionPane.showMessageDialog(null, "Error: " + throwable.getMessage());
