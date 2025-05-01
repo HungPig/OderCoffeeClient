@@ -1,10 +1,12 @@
 package Order.Modal.forms;
 
+import Order.Modal.Api.APIClient;
+import Order.Modal.Api.ProductAPI;
+import Order.Modal.Entity.products;
+import Order.Modal.Response.ApiResponse;
 import Order.Modal.System.Form;
-import Order.Modal.model.ModelEmployee;
 import Order.Modal.model.ModelProfile;
-import Order.Modal.sample.SampleData;
-import Order.Modal.simple.SimpleInputForms;
+import Order.Modal.utils.DisplayUtils;
 import Order.Modal.utils.SystemForm;
 import Order.Modal.utils.table.CheckBoxTableHeaderRenderer;
 import Order.Modal.utils.table.TableHeaderAlignment;
@@ -12,14 +14,24 @@ import Order.Modal.utils.table.TableProfileCellRenderer;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import net.miginfocom.swing.MigLayout;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import raven.modal.ModalDialog;
 import raven.modal.component.SimpleModalBorder;
 import raven.modal.option.Location;
 import raven.modal.option.Option;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.io.File;
+import java.util.List;
+
+import static Order.Modal.sample.SampleData.getProfileIcon;
 
 @SystemForm(name = "Product", description = "Product table with advanced features", tags = {"list", "table"})
 public class FormProduct extends Form {
@@ -27,16 +39,22 @@ public class FormProduct extends Form {
     private JComboBox comboCategory;
     private JTextField txtFieldID;
     private JTextField txtFieldPrice;
+    private JTextField txtFieldName;
     private JTextField txtFieldDescription;
     private JComboBox comboStatus;
+    private JTable table;
+    private JLabel lblImagePreview;
+    private File selectedImageFile;
+
     public FormProduct() {
+        loadData();
         init();
     }
 
     private void init() {
         setLayout(new MigLayout("fillx,wrap,insets 10 0 10 0", "[fill]", "[][]0[fill,grow]"));
         // create table model
-        Object columns[] = new Object[]{"SELECT", "#", "NAME", "PRICE", "STATUS","DESCRIPTION"};
+        Object columns[] = new Object[]{"SELECT", "#", "NAME", "PRICE", "STATUS", "DESCRIPTION"};
         DefaultTableModel model = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -59,7 +77,7 @@ public class FormProduct extends Form {
 
 
         // create table
-        JTable table = new JTable(model);
+        table = new JTable(model);
 
         // table scroll
         JScrollPane scrollPane = new JScrollPane(table);
@@ -126,11 +144,50 @@ public class FormProduct extends Form {
         add(scrollPane);
 
         // sample data
-        for (ModelEmployee d : SampleData.getSampleEmployeeData(false)) {
-            model.addRow(d.toTableRowCustom(table.getRowCount() + 1));
-        }
+//        for (ModelEmployee d : SampleData.getSampleEmployeeData(false)) {
+//            model.addRow(d.toTableRowCustom(table.getRowCount() + 1));
+//        }
     }
 
+    public void loadData() {
+        try {
+            ProductAPI productAPI = APIClient.getClient().create(ProductAPI.class);
+            productAPI.getAllProducts().enqueue(new Callback<ApiResponse<List<products>>>() {
+                @Override
+                public void onResponse(Call<ApiResponse<List<products>>> call, Response<ApiResponse<List<products>>> response) {
+                    DefaultTableModel model = (DefaultTableModel) table.getModel();
+                    model.setRowCount(0);
+                    assert response.body() != null;
+                    boolean defaultIcon = false;
+                    for (products product : response.body().getData()) {
+                        model.addRow(new Object[]{
+                                false,
+                                product.getId(),
+                                new ModelProfile(
+                                        getProfileIcon(product.getImage(), defaultIcon),
+                                        product.getName(),
+                                        DisplayUtils.getCategoryName(product.getCategory_id())
+                                ),
+                                product.getPrice(),
+                                DisplayUtils.getStatusText(product.getStatus()),
+                                product.getDescription()
+                        });
+                        table.setModel(model);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ApiResponse<List<products>>> call, Throwable throwable) {
+                    JOptionPane.showMessageDialog(FormProduct.this,
+                            "Lỗi kết nối API: " + throwable.getMessage(),
+                            "Lỗi",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            });
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     private Component createHeaderAction() {
         JPanel panel = new JPanel(new MigLayout("insets 5 20 5 20", "[fill,230]push[][]"));
@@ -151,11 +208,14 @@ public class FormProduct extends Form {
                 "background:null;");
         return panel;
     }
+
     public Component inputProduct() {
         JPanel panel = new JPanel(new MigLayout("fillx,wrap,insets 5 30 5 30,width 400", "[fill]", ""));
-        // Khởi tạo các trường
         if (txtFieldID == null) {
             txtFieldID = new JTextField();
+        }
+        if(txtFieldName==null) {
+            txtFieldName = new JTextField();
         }
         if (comboCategory == null) {
             comboCategory = new JComboBox();
@@ -170,19 +230,18 @@ public class FormProduct extends Form {
             txtFieldDescription = new JTextField();
         }
 
-
+        txtFieldID.setEditable(false);
         txtFieldID.setEditable(false);
         txtFieldID.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "ID will be generated automatically");
+        txtFieldName.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "e.g. Cappuccino");
         comboCategory.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "e.g. Coffee");
         txtFieldPrice.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "e.g. 10.99");
         comboStatus.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "e.g. Active");
         txtFieldDescription.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Short description about category");
-
         JLabel lbTitle = new JLabel("Please complete the following Category to add data!");
         lbTitle.putClientProperty(FlatClientProperties.STYLE, "font:+2");
         panel.add(lbTitle, "gapy 5 0");
         panel.add(new JSeparator(), "height 2!,gapy 0 5");
-
         JPanel pID = new JPanel(new MigLayout("fillx,wrap", "[fill]", ""));
         JLabel lbID = new JLabel("ID");
         lbID.putClientProperty(FlatClientProperties.STYLE, "font:+1");
@@ -190,12 +249,12 @@ public class FormProduct extends Form {
         pID.add(txtFieldID);
         panel.add(pID);
 
-        JPanel pCate = new JPanel(new MigLayout("fillx,wrap", "[fill]", ""));
-        JLabel lbCategory = new JLabel("Category");
-        lbCategory.putClientProperty(FlatClientProperties.STYLE, "font:+1");
-        pCate.add(lbCategory);
-        pCate.add(comboCategory);
-        panel.add(pCate);
+        JPanel pName = new JPanel(new MigLayout("fillx,wrap", "[fill]", ""));
+        JLabel lbName = new JLabel("Name");
+        lbName.putClientProperty(FlatClientProperties.STYLE, "font:+1");
+        pName.add(lbName);
+        pName.add(txtFieldName);
+        panel.add(pName);
 
         JPanel pPrice = new JPanel(new MigLayout("fillx,wrap", "[fill]", ""));
         JLabel lbPrice = new JLabel("Price");
@@ -203,24 +262,84 @@ public class FormProduct extends Form {
         pPrice.add(lbPrice);
         pPrice.add(txtFieldPrice);
         panel.add(pPrice);
-
-        // --- Status Field ---
+        JPanel pCate = new JPanel(new MigLayout("fillx,wrap", "[fill]", ""));
+        JLabel lbCategory = new JLabel("Category");
+        lbCategory.putClientProperty(FlatClientProperties.STYLE, "font:+1");
+        pCate.add(lbCategory);
+        pCate.add(comboCategory);
+        panel.add(pCate);
         JPanel pStatus = new JPanel(new MigLayout("fillx,wrap", "[fill]", ""));
         JLabel lbStatus = new JLabel("Status");
         lbStatus.putClientProperty(FlatClientProperties.STYLE, "font:+1");
         pStatus.add(lbStatus);
         pStatus.add(comboStatus);
         panel.add(pStatus);
-
-        // --- Description Field ---
         JPanel pDescription = new JPanel(new MigLayout("fillx,wrap", "[fill]", ""));
         JLabel lbDescription = new JLabel("Description");
         lbDescription.putClientProperty(FlatClientProperties.STYLE, "font:+1");
         pDescription.add(lbDescription);
         pDescription.add(txtFieldDescription);
         panel.add(pDescription);
-
+        JPanel pImage = new JPanel(new MigLayout("fillx,wrap", "[fill]", ""));
+        JLabel lbImage = new JLabel("Product Image");
+        lbImage.putClientProperty(FlatClientProperties.STYLE, "font:+1");
+        JButton btnChooseImage = new JButton("Choose Image");
+        lblImagePreview = new JLabel();
+        btnChooseImage.addActionListener(e -> {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Choose Image");
+            int result = fileChooser.showOpenDialog(null);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                selectedImageFile = fileChooser.getSelectedFile();
+                ImageIcon icon = new ImageIcon(selectedImageFile.getAbsolutePath());
+                Image scaledImg = icon.getImage().getScaledInstance(50, 100, Image.SCALE_SMOOTH);
+                lblImagePreview.setIcon(new ImageIcon(scaledImg));
+            }
+        });
+        pImage.add(lbImage);
+        pImage.add(btnChooseImage);
+        pImage.add(lblImagePreview, "h 50!, w 100!");
+        panel.add(pImage);
+        initComboStatus(comboStatus);
+        initComboCate(comboCategory);
         return panel;
+    }
+
+    public void postProduct() {
+        String name = txtFieldName.getText();
+        String description = txtFieldDescription.getText();
+        int priceStr = Integer.parseInt(txtFieldPrice.getText());
+        String status = (String) comboStatus.getSelectedItem();
+        String category = (String) comboCategory.getSelectedItem();
+        RequestBody namePart = RequestBody.create(name, MediaType.parse("text/plain"));
+        RequestBody descPart = RequestBody.create(description, MediaType.parse("text/plain"));
+        RequestBody pricePart = RequestBody.create(priceStr, MediaType.parse("text/plain"))
+        RequestBody statusPart = RequestBody.create(status, MediaType.parse("text/plain"));
+        RequestBody categoryIdPart = RequestBody.create(String.valueOf(category.getId()), MediaType.parse("text/plain"));
+        RequestBody filePart = RequestBody.create(selectedImageFile, MediaType.parse("image/*"));
+        MultipartBody.Part image = MultipartBody.Part.createFormData("image", selectedImageFile.getName(), filePart);
+        ProductAPI productAPI = APIClient.getClient().create(ProductAPI.class);
+        productAPI.createProduct(namePart, descPart, pricePart, statusPart, categoryIdPart, image).enqueue(new Callback<ApiResponse>() {
+            @Override
+            public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse> call, Throwable throwable) {
+
+            }
+        });
+    }
+
+
+    private void initComboStatus(JComboBox combo) {
+        combo.addItem("Còn Hàng");
+        combo.addItem("Hết Hàng");
+    }
+    private void initComboCate(JComboBox combo) {
+        combo.addItem("Cà Phê");
+        combo.addItem("Trà Sữa");
     }
 
     private void showModal() {

@@ -1,7 +1,6 @@
 package Order.Modal.sample;
 
 import Order.Modal.model.ModelEmployee;
-import Order.Modal.model.ModelProfile;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
@@ -13,27 +12,31 @@ import org.jfree.data.xy.OHLCDataset;
 import org.jfree.data.xy.TableXYDataset;
 import raven.extras.AvatarIcon;
 
-
 import javax.swing.*;
-import java.util.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 public class SampleData {
 
 
-
     public static List<ModelEmployee> getSampleEmployeeData(boolean defaultIcon) {
         List<ModelEmployee> list = new ArrayList<>();
-        list.add(new ModelEmployee( 1750, "Business Analyst", "Analytical thinker with experience in business process improvement.", new ModelProfile(getProfileIcon("profile_1.jpg", defaultIcon), "Hannah Scott", "Washington, D.C.")));
-        list.add(new ModelEmployee( 1200, "Marketing Manager", "Experienced marketing professional with a focus on digital advertising.", new ModelProfile(getProfileIcon("profile_2.jpg", defaultIcon), "Samantha Smith", "New York City")));
-        list.add(new ModelEmployee( 1500, "Software Engineer", "Skilled developer proficient in Java, Python, and JavaScript.", new ModelProfile(getProfileIcon("profile_3.jpg", defaultIcon), "John Johnson", "Los Angeles")));
-        list.add(new ModelEmployee( 1300, "Graphic Designer", "Creative designer with expertise in Adobe Creative Suite.", new ModelProfile(getProfileIcon("profile_4.jpg", defaultIcon), "Emily Brown", "Chicago")));
-        list.add(new ModelEmployee( 1800, "Financial Analyst", "Analytical thinker with a background in financial modeling and forecasting.", new ModelProfile(getProfileIcon("profile_5.jpg", defaultIcon), "Michael Davis", "San Francisco")));
-        list.add(new ModelEmployee( 1450, "Financial Planner", "Certified financial planner with a client-centered approach.", new ModelProfile(getProfileIcon("profile_6.jpg", defaultIcon), "Justin White", "San Diego")));
-        list.add(new ModelEmployee(1700, "Sales Representative", "Proven track record in sales and client relationship management.", new ModelProfile(getProfileIcon("profile_7.jpg", defaultIcon), "David Martinez", "Miami")));
-        list.add(new ModelEmployee( 1900, "Project Manager", "Organized leader skilled in managing cross-functional teams.", new ModelProfile(getProfileIcon("profile_8.jpg", defaultIcon), "Ryan Anderson", "Portland")));
-        list.add(new ModelEmployee( 1550, "UX/UI Designer", "Design thinker focused on creating intuitive user experiences.", new ModelProfile(getProfileIcon("profile_9.jpg", defaultIcon), "Daniel Wilson", "Austin")));
+//        list.add(new ModelEmployee( 1750, "Business Analyst", "Analytical thinker with experience in business process improvement.", new ModelProfile(getProfileIcon("profile_1.jpg", defaultIcon), "Hannah Scott", "Washington, D.C.")));
+//        list.add(new ModelEmployee( 1200, "Marketing Manager", "Experienced marketing professional with a focus on digital advertising.", new ModelProfile(getProfileIcon("profile_2.jpg", defaultIcon), "Samantha Smith", "New York City")));
+//        list.add(new ModelEmployee( 1500, "Software Engineer", "Skilled developer proficient in Java, Python, and JavaScript.", new ModelProfile(getProfileIcon("profile_3.jpg", defaultIcon), "John Johnson", "Los Angeles")));
+//        list.add(new ModelEmployee( 1300, "Graphic Designer", "Creative designer with expertise in Adobe Creative Suite.", new ModelProfile(getProfileIcon("profile_4.jpg", defaultIcon), "Emily Brown", "Chicago")));
+//        list.add(new ModelEmployee( 1800, "Financial Analyst", "Analytical thinker with a background in financial modeling and forecasting.", new ModelProfile(getProfileIcon("profile_5.jpg", defaultIcon), "Michael Davis", "San Francisco")));
+//        list.add(new ModelEmployee( 1450, "Financial Planner", "Certified financial planner with a client-centered approach.", new ModelProfile(getProfileIcon("profile_6.jpg", defaultIcon), "Justin White", "San Diego")));
+//        list.add(new ModelEmployee(1700, "Sales Representative", "Proven track record in sales and client relationship management.", new ModelProfile(getProfileIcon("profile_7.jpg", defaultIcon), "David Martinez", "Miami")));
+//        list.add(new ModelEmployee( 1900, "Project Manager", "Organized leader skilled in managing cross-functional teams.", new ModelProfile(getProfileIcon("profile_8.jpg", defaultIcon), "Ryan Anderson", "Portland")));
+//        list.add(new ModelEmployee( 1550, "UX/UI Designer", "Design thinker focused on creating intuitive user experiences.", new ModelProfile(getProfileIcon("profile_9.jpg", defaultIcon), "Daniel Wilson", "Austin")));
         return list;
     }
+
     public static List<ModelEmployee> getSampleBasicEmployeeData() {
         List<ModelEmployee> list = new ArrayList<>();
 //        list.add(new ModelEmployee("20-August-2024", 1750, "Business Analyst", "Analytical thinker with experience in business process improvement.", new ModelProfile(null, "Hannah Scott", "Washington, D.C.")));
@@ -58,8 +61,6 @@ public class SampleData {
 //        list.add(new ModelEmployee("15-August-2024", 1450, "Financial Planner", "Certified financial planner with a client-centered approach.", new ModelProfile(null, "Justin White", "San Diego")));
         return list;
     }
-
-
 
 
     public static TableXYDataset getTimeSeriesDataset() {
@@ -454,13 +455,19 @@ public class SampleData {
         return calendar.getTime();
     }
 
-    private static Icon getProfileIcon(String name, boolean defaultIcon) {
-        if (defaultIcon) {
-            return new ImageIcon(Objects.requireNonNull(SampleData.class.getResource("/Order/images/" + name)));
-        } else {
-            AvatarIcon avatarIcon = new AvatarIcon(SampleData.class.getResource("/Order/images/" + name), 55, 55, 3f);
-            avatarIcon.setType(AvatarIcon.Type.MASK_SQUIRCLE);
-            return avatarIcon;
+    public static Icon getProfileIcon(String name, boolean defaultIcon) {
+        try {
+            URL imageUrl = new URL("http://localhost:8080/images/" + name);
+            if (defaultIcon) {
+                return new ImageIcon(imageUrl);
+            } else {
+                AvatarIcon avatarIcon = new AvatarIcon(imageUrl, 55, 55, 3f);
+                avatarIcon.setType(AvatarIcon.Type.MASK_SQUIRCLE);
+                return avatarIcon;
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }

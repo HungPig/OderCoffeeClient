@@ -80,9 +80,6 @@ public class FormCategory extends Form {
         }
     }
 
-    private void loadAll() {
-
-    }
 
     public Component inputCate() {
         JPanel panel = new JPanel(new MigLayout("fillx,wrap,insets 5 30 5 30,width 400", "[fill]", ""));

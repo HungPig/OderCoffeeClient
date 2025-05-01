@@ -9,12 +9,12 @@ import javax.swing.*;
 @Getter
 public class ModelProfile {
 
-    public ModelProfile(Icon icon, String name, String location) {
+    public ModelProfile(Icon icon, String name, String category) {
         this.icon = icon;
         this.name = name;
-        this.location = location;
+        this.category = category;
     }
     private Icon icon;
     private String name;
-    private String location;
+    private String category;
 }

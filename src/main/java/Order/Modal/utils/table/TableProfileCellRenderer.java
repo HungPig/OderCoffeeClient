@@ -5,7 +5,7 @@ import com.formdev.flatlaf.FlatClientProperties;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
-import javax.swing.table.TableCellRenderer;
+        import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 
 public class TableProfileCellRenderer extends JPanel implements TableCellRenderer {
@@ -42,7 +42,7 @@ public class TableProfileCellRenderer extends JPanel implements TableCellRendere
                 labelProfile.setIcon(null);
             }
             labelName.setText(profile.getName());
-            labelLocation.setText(profile.getLocation());
+            labelLocation.setText(String.valueOf(profile.getCategory()));
             setBackground(com.getBackground());
             setBorder(com.getBorder());
             return this;
