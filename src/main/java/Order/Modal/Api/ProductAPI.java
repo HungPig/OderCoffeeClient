@@ -22,4 +22,15 @@ public interface ProductAPI {
             @Part("category_id") RequestBody category_id,
             @Part MultipartBody.Part image
     );
+    @Multipart
+    @PATCH("/api/products/{id}")
+    Call<ApiResponse> updateProduct(
+            @Path("id") String id,
+            @Part("name") RequestBody name,
+            @Part("description") RequestBody description,
+            @Part("price") RequestBody price,
+            @Part("status") RequestBody status,
+            @Part("category_id") RequestBody categoryId,
+            @Part MultipartBody.Part image
+    );
 }

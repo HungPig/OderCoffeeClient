@@ -6,6 +6,7 @@ import Order.Modal.Entity.products;
 import Order.Modal.Response.ApiResponse;
 import Order.Modal.System.Form;
 import Order.Modal.model.ModelProfile;
+import Order.Modal.utils.ComboItem;
 import Order.Modal.utils.DisplayUtils;
 import Order.Modal.utils.SystemForm;
 import Order.Modal.utils.table.CheckBoxTableHeaderRenderer;
@@ -189,6 +190,11 @@ public class FormProduct extends Form {
         }
     }
 
+    @Override
+    public void formRefresh() {
+        loadData();
+    }
+
     private Component createHeaderAction() {
         JPanel panel = new JPanel(new MigLayout("insets 5 20 5 20", "[fill,230]push[][]"));
 
@@ -214,7 +220,7 @@ public class FormProduct extends Form {
         if (txtFieldID == null) {
             txtFieldID = new JTextField();
         }
-        if(txtFieldName==null) {
+        if (txtFieldName == null) {
             txtFieldName = new JTextField();
         }
         if (comboCategory == null) {
@@ -229,7 +235,6 @@ public class FormProduct extends Form {
         if (txtFieldDescription == null) {
             txtFieldDescription = new JTextField();
         }
-
         txtFieldID.setEditable(false);
         txtFieldID.setEditable(false);
         txtFieldID.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "ID will be generated automatically");
@@ -309,37 +314,144 @@ public class FormProduct extends Form {
         String name = txtFieldName.getText();
         String description = txtFieldDescription.getText();
         int priceStr = Integer.parseInt(txtFieldPrice.getText());
-        String status = (String) comboStatus.getSelectedItem();
-        String category = (String) comboCategory.getSelectedItem();
-        RequestBody namePart = RequestBody.create(name, MediaType.parse("text/plain"));
-        RequestBody descPart = RequestBody.create(description, MediaType.parse("text/plain"));
-        RequestBody pricePart = RequestBody.create(priceStr, MediaType.parse("text/plain"))
-        RequestBody statusPart = RequestBody.create(status, MediaType.parse("text/plain"));
-        RequestBody categoryIdPart = RequestBody.create(String.valueOf(category.getId()), MediaType.parse("text/plain"));
+        ComboItem selectedStatus = (ComboItem) comboStatus.getSelectedItem();
+        ComboItem selectedCategory = (ComboItem) comboCategory.getSelectedItem();
+        int status = selectedStatus.getId();
+        int categoryId = selectedCategory.getId();
+        RequestBody namePart = RequestBody.create(MediaType.parse("text/plain"), name);
+        RequestBody descPart = RequestBody.create(MediaType.parse("text/plain"), description);
+        RequestBody pricePart = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(priceStr));
+        RequestBody statusPart = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(status));
+        RequestBody categoryIdPart = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(categoryId));
         RequestBody filePart = RequestBody.create(selectedImageFile, MediaType.parse("image/*"));
         MultipartBody.Part image = MultipartBody.Part.createFormData("image", selectedImageFile.getName(), filePart);
         ProductAPI productAPI = APIClient.getClient().create(ProductAPI.class);
         productAPI.createProduct(namePart, descPart, pricePart, statusPart, categoryIdPart, image).enqueue(new Callback<ApiResponse>() {
             @Override
             public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
-
+                if (response.isSuccessful() && response.body() != null) {
+                    JOptionPane.showMessageDialog(null, "Product created successfully!");
+                } else {
+                    JOptionPane.showMessageDialog(null, "Failed to create product!");
+                }
             }
 
             @Override
             public void onFailure(Call<ApiResponse> call, Throwable throwable) {
-
+                JOptionPane.showMessageDialog(null, "Error: " + throwable.getMessage());
             }
         });
     }
 
+    public void edit() {
+        int selectedRow = -1;
+        for (int i = 0; i < table.getRowCount(); i++) {
+            Boolean isChecked = (Boolean) table.getValueAt(i, 0);
+            if (isChecked != null && isChecked) {
+                selectedRow = i;
+                break;
+            }
+        }
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(null, "Please select a product to edit.");
+            return;
+        }
 
-    private void initComboStatus(JComboBox combo) {
-        combo.addItem("Còn Hàng");
-        combo.addItem("Hết Hàng");
+        String productId = table.getValueAt(selectedRow, 1).toString();
+        ProductAPI productAPI = APIClient.getClient().create(ProductAPI.class);
+        productAPI.getProductId(productId).enqueue(new Callback<ApiResponse>() {
+            @Override
+            public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    products product = (products) response.body().getData();
+
+                    txtFieldName.setText(product.getName());
+                    txtFieldDescription.setText(product.getDescription());
+                    txtFieldPrice.setText(String.valueOf(product.getPrice()));
+                    selectComboItemByValue(comboStatus, String.valueOf(product.getStatus()));
+                    selectComboItemByValue(comboCategory, String.valueOf(product.getCategory_id()));
+
+                    Option option = ModalDialog.createOption();
+                    option.getLayoutOption().setSize(-1, 1f)
+                            .setLocation(Location.TRAILING, Location.TOP)
+                            .setAnimateDistance(0.7f, 0);
+                    ModalDialog.showModal(FormProduct.this, new SimpleModalBorder(
+                            inputProduct(), "Edit Product", SimpleModalBorder.YES_NO_OPTION,
+                            (controller, action) -> {
+                                if (action == SimpleModalBorder.YES_OPTION) {
+                                    String name = txtFieldName.getText();
+                                    String description = txtFieldDescription.getText();
+                                    int price = Integer.parseInt(txtFieldPrice.getText());
+                                    String status = ((ComboItem) comboStatus.getSelectedItem()).getId();
+                                    String categoryId = ((ComboItem) comboCategory.getSelectedItem()).getValue();
+
+                                    RequestBody namePart = RequestBody.create(MediaType.parse("text/plain"), name);
+                                    RequestBody descPart = RequestBody.create(MediaType.parse("text/plain"), description);
+                                    RequestBody pricePart = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(price));
+                                    RequestBody statusPart = RequestBody.create(MediaType.parse("text/plain"), status);
+                                    RequestBody categoryIdPart = RequestBody.create(MediaType.parse("text/plain"), categoryId);
+
+                                    MultipartBody.Part imagePart = null;
+                                    if (selectedImageFile != null) {
+                                        RequestBody filePart = RequestBody.create(selectedImageFile, MediaType.parse("image/*"));
+                                        imagePart = MultipartBody.Part.createFormData("image", selectedImageFile.getName(), filePart);
+                                    }
+
+                                    productAPI.updateProduct(productId, namePart, descPart, pricePart, statusPart, categoryIdPart, imagePart)
+                                            .enqueue(new Callback<ApiResponse>() {
+                                                @Override
+                                                public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+                                                    if (response.isSuccessful()) {
+                                                        JOptionPane.showMessageDialog(null, "Product updated successfully!");
+                                                        loadData();
+                                                    } else {
+                                                        JOptionPane.showMessageDialog(null, "Failed to update product.");
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onFailure(Call<ApiResponse> call, Throwable t) {
+                                                    JOptionPane.showMessageDialog(null, "Error: " + t.getMessage());
+                                                }
+                                            });
+                                }
+                            }
+                    ), option);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Product not found.");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse> call, Throwable t) {
+                JOptionPane.showMessageDialog(null, "Error: " + t.getMessage());
+            }
+        });
+
     }
-    private void initComboCate(JComboBox combo) {
-        combo.addItem("Cà Phê");
-        combo.addItem("Trà Sữa");
+
+    private void selectComboItemByValue(JComboBox comboBox, String value) {
+        for (int i = 0; i < comboBox.getItemCount(); i++) {
+            ComboItem item = (ComboItem) comboBox.getItemAt(i);
+            if (item.getValue().equals(value)) {
+                comboBox.setSelectedIndex(i);
+                break;
+            }
+        }
+    }
+
+
+
+    private void initComboStatus(JComboBox<ComboItem> combo) {
+        combo.removeAllItems();
+        combo.addItem(new ComboItem(1, "Còn Hàng"));
+        combo.addItem(new ComboItem(0, "Hết Hàng"));
+    }
+
+    private void initComboCate(JComboBox<ComboItem> combo) {
+        combo.removeAllItems();
+        combo.addItem(new ComboItem(1, "Cà Phê"));
+        combo.addItem(new ComboItem(2, "Trà Sữa"));
     }
 
     private void showModal() {
@@ -350,7 +462,9 @@ public class FormProduct extends Form {
         ModalDialog.showModal(this, new SimpleModalBorder(
                 inputProduct(), "Create", SimpleModalBorder.YES_NO_OPTION,
                 (controller, action) -> {
-
+                    if (action == SimpleModalBorder.YES_OPTION) {
+                        postProduct();
+                    }
                 }), option);
     }
 }

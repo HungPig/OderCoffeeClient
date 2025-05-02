@@ -194,6 +194,8 @@ public class FormCategory extends Form {
         return model;
     }
 
+
+
     private Component createHeaderAction() {
         JPanel panel = new JPanel(new MigLayout("insets 5 20 5 20", "[fill,230]push[][]"));
 
