@@ -2,9 +2,9 @@ package Order.Modal.Api;
 
 import Order.Modal.Entity.categories;
 import Order.Modal.Response.ApiResponse;
-import Order.Modal.Response.CategoryResponse;
-import Order.Modal.Response.CreateCategoryResponse;
-import Order.Modal.Response.DeleteCategoryResponse;
+import Order.Modal.Response.category.CategoryResponse;
+import Order.Modal.Response.category.CreateCategoryResponse;
+import Order.Modal.Response.category.DeleteCategoryResponse;
 import retrofit2.Call;
 import retrofit2.http.*;
 

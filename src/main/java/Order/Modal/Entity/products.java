@@ -12,7 +12,7 @@ import java.io.Serializable;
 @Setter
 public class products implements Serializable {
     @SerializedName("id")
-    private long id;
+    private String id;
     @SerializedName("name")
     private String name;
     @SerializedName("description")

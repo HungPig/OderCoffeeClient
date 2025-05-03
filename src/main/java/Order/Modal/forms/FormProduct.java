@@ -1,9 +1,15 @@
 package Order.Modal.forms;
 
 import Order.Modal.Api.APIClient;
+import Order.Modal.Api.CategoryAPI;
 import Order.Modal.Api.ProductAPI;
+import Order.Modal.Entity.categories;
 import Order.Modal.Entity.products;
 import Order.Modal.Response.ApiResponse;
+import Order.Modal.Response.category.CreateCategoryResponse;
+import Order.Modal.Response.category.DeleteCategoryResponse;
+import Order.Modal.Response.products.CreatedProductReponse;
+import Order.Modal.Response.products.DeleteProductResponse;
 import Order.Modal.System.Form;
 import Order.Modal.model.ModelProfile;
 import Order.Modal.utils.ComboItem;
@@ -97,6 +103,17 @@ public class FormProduct extends Form {
         // apply profile cell renderer
         table.setDefaultRenderer(ModelProfile.class, new TableProfileCellRenderer(table));
 
+        table.getModel().addTableModelListener(e -> {
+            if (e.getColumn() == 0) {
+                int changedRow = e.getFirstRow();
+                for (int i = 0; i < table.getRowCount(); i++) {
+                    if (i != changedRow && (Boolean) table.getValueAt(i, 0)) {
+                        table.setValueAt(false, i, 0);
+                    }
+                }
+            }
+        });
+
         // apply checkbox custom to table header
         table.getColumnModel().getColumn(0).setHeaderRenderer(new CheckBoxTableHeaderRenderer(table, 0));
 
@@ -144,10 +161,6 @@ public class FormProduct extends Form {
         add(createHeaderAction());
         add(scrollPane);
 
-        // sample data
-//        for (ModelEmployee d : SampleData.getSampleEmployeeData(false)) {
-//            model.addRow(d.toTableRowCustom(table.getRowCount() + 1));
-//        }
     }
 
     public void loadData() {
@@ -205,6 +218,16 @@ public class FormProduct extends Form {
         JButton cmdEdit = new JButton("Edit");
         JButton cmdDelete = new JButton("Delete");
         cmdCreate.addActionListener(e -> showModal());
+        cmdEdit.addActionListener(e -> edit());
+        cmdDelete.addActionListener(e -> Delete());
+        txtSearch.addActionListener(e -> {
+            String keyword = txtSearch.getText().trim();
+            if (txtSearch.getText().isEmpty()) {
+                loadData();
+            } else {
+                searchProduct(keyword);
+            }
+        });
         panel.add(txtSearch);
         panel.add(cmdCreate);
         panel.add(cmdEdit);
@@ -343,6 +366,48 @@ public class FormProduct extends Form {
         });
     }
 
+    private void searchProduct(String keyword) {
+        ProductAPI productAPI = APIClient.getClient().create(ProductAPI.class);
+        productAPI.getProductBySearch(keyword).enqueue(new Callback<ApiResponse<List<products>>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<List<products>>> call, Response<ApiResponse<List<products>>> response) {
+                if (response.isSuccessful()) {
+                    ApiResponse<List<products>> apiResponse = response.body();
+                    List<products> categoriesList = apiResponse != null ? apiResponse.getData() : null;
+                    SwingUtilities.invokeLater(() -> {
+                        DefaultTableModel model = (DefaultTableModel) table.getModel();
+                        model.setRowCount(0);
+                        boolean defaultIcon = false;
+                        if (categoriesList != null) {
+                            for (products product : categoriesList) {
+                                model.addRow(new Object[]{
+                                        false,
+                                        product.getId(),
+                                        new ModelProfile(
+                                                getProfileIcon(product.getImage(), defaultIcon),
+                                                product.getName(),
+                                                DisplayUtils.getCategoryName(product.getCategory_id())
+                                        ),
+                                        product.getPrice(),
+                                        DisplayUtils.getStatusText(product.getStatus()),
+                                        product.getDescription()
+                                });
+                            }
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<List<products>>> call, Throwable throwable) {
+                JOptionPane.showMessageDialog(FormProduct.this,
+                        "Lỗi khi tìm kiếm: " + throwable.getMessage(),
+                        "Lỗi",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        });
+    }
+
     public void edit() {
         int selectedRow = -1;
         for (int i = 0; i < table.getRowCount(); i++) {
@@ -356,15 +421,16 @@ public class FormProduct extends Form {
             JOptionPane.showMessageDialog(null, "Please select a product to edit.");
             return;
         }
+        Component form = inputProduct();
 
         String productId = table.getValueAt(selectedRow, 1).toString();
         ProductAPI productAPI = APIClient.getClient().create(ProductAPI.class);
-        productAPI.getProductId(productId).enqueue(new Callback<ApiResponse>() {
+        productAPI.getProductId(productId).enqueue(new Callback<CreatedProductReponse>() {
             @Override
-            public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+            public void onResponse(Call<CreatedProductReponse> call, Response<CreatedProductReponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    products product = (products) response.body().getData();
-
+                    products product = response.body().getData();
+                    txtFieldID.setText(product.getId());
                     txtFieldName.setText(product.getName());
                     txtFieldDescription.setText(product.getDescription());
                     txtFieldPrice.setText(String.valueOf(product.getPrice()));
@@ -382,14 +448,14 @@ public class FormProduct extends Form {
                                     String name = txtFieldName.getText();
                                     String description = txtFieldDescription.getText();
                                     int price = Integer.parseInt(txtFieldPrice.getText());
-                                    String status = ((ComboItem) comboStatus.getSelectedItem()).getId();
-                                    String categoryId = ((ComboItem) comboCategory.getSelectedItem()).getValue();
+                                    int status = ((ComboItem) comboStatus.getSelectedItem()).getId();
+                                    int categoryId = ((ComboItem) comboCategory.getSelectedItem()).getId();
 
                                     RequestBody namePart = RequestBody.create(MediaType.parse("text/plain"), name);
                                     RequestBody descPart = RequestBody.create(MediaType.parse("text/plain"), description);
                                     RequestBody pricePart = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(price));
-                                    RequestBody statusPart = RequestBody.create(MediaType.parse("text/plain"), status);
-                                    RequestBody categoryIdPart = RequestBody.create(MediaType.parse("text/plain"), categoryId);
+                                    RequestBody statusPart = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(status));
+                                    RequestBody categoryIdPart = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(categoryId));
 
                                     MultipartBody.Part imagePart = null;
                                     if (selectedImageFile != null) {
@@ -398,9 +464,9 @@ public class FormProduct extends Form {
                                     }
 
                                     productAPI.updateProduct(productId, namePart, descPart, pricePart, statusPart, categoryIdPart, imagePart)
-                                            .enqueue(new Callback<ApiResponse>() {
+                                            .enqueue(new Callback<CreatedProductReponse>() {
                                                 @Override
-                                                public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+                                                public void onResponse(Call<CreatedProductReponse> call, Response<CreatedProductReponse> response) {
                                                     if (response.isSuccessful()) {
                                                         JOptionPane.showMessageDialog(null, "Product updated successfully!");
                                                         loadData();
@@ -410,7 +476,7 @@ public class FormProduct extends Form {
                                                 }
 
                                                 @Override
-                                                public void onFailure(Call<ApiResponse> call, Throwable t) {
+                                                public void onFailure(Call<CreatedProductReponse> call, Throwable t) {
                                                     JOptionPane.showMessageDialog(null, "Error: " + t.getMessage());
                                                 }
                                             });
@@ -423,17 +489,50 @@ public class FormProduct extends Form {
             }
 
             @Override
-            public void onFailure(Call<ApiResponse> call, Throwable t) {
+            public void onFailure(Call<CreatedProductReponse> call, Throwable t) {
                 JOptionPane.showMessageDialog(null, "Error: " + t.getMessage());
             }
         });
 
     }
 
+    private void Delete() {
+        int selectedRow = -1;
+        for (int i = 0; i < table.getRowCount(); i++) {
+            Boolean isChecked = (Boolean) table.getValueAt(i, 0);
+            if (isChecked != null && isChecked) {
+                selectedRow = i;
+                break;
+            }
+        }
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(null, "Please select a product to edit.");
+            return;
+        }
+        int result = JOptionPane.showConfirmDialog(null, "Confirm", "Are you sure?", JOptionPane.YES_NO_OPTION);
+        String productID = table.getValueAt(selectedRow, 1).toString();
+        if (result == JOptionPane.YES_OPTION) {
+            ProductAPI productAPI = APIClient.getClient().create(ProductAPI.class);
+            productAPI.deleteProduct(productID).enqueue(new Callback<DeleteProductResponse>() {
+                @Override
+                public void onResponse(Call<DeleteProductResponse> call, Response<DeleteProductResponse> response) {
+                    if (response.isSuccessful()) {
+                        loadData();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<DeleteProductResponse> call, Throwable throwable) {
+                    JOptionPane.showMessageDialog(null, throwable.getMessage());
+                }
+            });
+        }
+    }
+
     private void selectComboItemByValue(JComboBox comboBox, String value) {
         for (int i = 0; i < comboBox.getItemCount(); i++) {
             ComboItem item = (ComboItem) comboBox.getItemAt(i);
-            if (item.getValue().equals(value)) {
+            if (String.valueOf(item.getId()).equals(value)) {
                 comboBox.setSelectedIndex(i);
                 break;
             }

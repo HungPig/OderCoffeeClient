@@ -1,7 +1,11 @@
 package Order.Modal.Api;
 
+import Order.Modal.Entity.categories;
 import Order.Modal.Entity.products;
 import Order.Modal.Response.ApiResponse;
+import Order.Modal.Response.category.DeleteCategoryResponse;
+import Order.Modal.Response.products.CreatedProductReponse;
+import Order.Modal.Response.products.DeleteProductResponse;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
@@ -12,6 +16,8 @@ import java.util.List;
 public interface ProductAPI {
     @GET("api/products")
     Call<ApiResponse<List<products>>> getAllProducts();
+    @GET("/api/products/{id}")
+    Call<CreatedProductReponse> getProductId(@Path("id") String id);
     @Multipart
     @POST("/api/products")
     Call<ApiResponse> createProduct(
@@ -24,7 +30,7 @@ public interface ProductAPI {
     );
     @Multipart
     @PATCH("/api/products/{id}")
-    Call<ApiResponse> updateProduct(
+    Call<CreatedProductReponse> updateProduct(
             @Path("id") String id,
             @Part("name") RequestBody name,
             @Part("description") RequestBody description,
@@ -33,4 +39,8 @@ public interface ProductAPI {
             @Part("category_id") RequestBody categoryId,
             @Part MultipartBody.Part image
     );
+    @DELETE("/api/products/{id}")
+    Call<DeleteProductResponse> deleteProduct(@Path("id") String id);
+    @GET("api/products/search")
+    Call<ApiResponse<List<products>>> getProductBySearch(@Query("keyword") String keyword);
 }
