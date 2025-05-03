@@ -1,4 +1,4 @@
-package Order.Modal.Response;
+package Order.Modal.Response.category;
 
 import Order.Modal.Entity.categories;
 
