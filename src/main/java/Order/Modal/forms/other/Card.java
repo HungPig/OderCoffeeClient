@@ -35,6 +35,11 @@ public class Card extends JPanel {
         add(panelBody);
     }
 
+    private void loadData()
+    {
+
+    }
+
     private JPanel createHeader() {
         JPanel header = new JPanel(new MigLayout("fill,insets 0", "[fill]", "[top]"));
         header.putClientProperty(FlatClientProperties.STYLE, "" +
@@ -61,7 +66,6 @@ public class Card extends JPanel {
         JLabel tableInfoLabel = new JLabel("Số bàn: " + order.getTableId() + " - Trạng thái Bàn: " + order.getTableStatus());
         tableInfoLabel.putClientProperty(FlatClientProperties.STYLE, "font:plain;");
         body.add(tableInfoLabel);
-
         JLabel totalAmountLabel = new JLabel("Tổng tiền: " + order.getTotal() + " đồng");
         totalAmountLabel.putClientProperty(FlatClientProperties.STYLE, "font:plain;");
         body.add(totalAmountLabel);
