@@ -1,6 +1,6 @@
 package Order.Modal.utils.table;
 
-import Order.Modal.model.ModelProfile;
+import Order.Modal.model.ModelProduct;
 import com.formdev.flatlaf.FlatClientProperties;
 import net.miginfocom.swing.MigLayout;
 
@@ -34,8 +34,8 @@ public class TableProfileCellRenderer extends JPanel implements TableCellRendere
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         JLabel com = (JLabel) delegate.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-        if (value instanceof ModelProfile) {
-            ModelProfile profile = (ModelProfile) value;
+        if (value instanceof ModelProduct) {
+            ModelProduct profile = (ModelProduct) value;
             if (profile.getIcon() != null) {
                 labelProfile.setIcon(profile.getIcon());
             } else {

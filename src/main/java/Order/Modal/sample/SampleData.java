@@ -1,6 +1,8 @@
 package Order.Modal.sample;
 
 import Order.Modal.model.ModelEmployee;
+import Order.Modal.model.ModelOrder;
+import Order.Modal.model.ModelProduct;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
@@ -15,6 +17,7 @@ import raven.extras.AvatarIcon;
 import javax.swing.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -23,9 +26,55 @@ import java.util.List;
 public class SampleData {
 
 
+    public static ArrayList<ModelOrder> getSampleOrderData() {
+        ArrayList<ModelOrder> list = new ArrayList<>();
+        list.add(new ModelOrder(
+                1, // ID đơn hàng
+                101, // ID bàn
+                "Đang phục vụ", // Trạng thái đơn hàng
+                150000, // Tổng tiền
+                LocalDateTime.now().minusHours(1), // Thời gian tạo
+                LocalDateTime.now(), // Thời gian cập nhật
+                "Trống", // Trạng thái bàn
+                "path/to/image1.png" // Hình ảnh bàn
+        ));
+        list.add(new ModelOrder(
+                2, // ID đơn hàng
+                102, // ID bàn
+                "Hoàn thành", // Trạng thái đơn hàng
+                300000, // Tổng tiền
+                LocalDateTime.now().minusDays(1), // Thời gian tạo
+                LocalDateTime.now().minusHours(5), // Thời gian cập nhật
+                "Trống", // Trạng thái bàn
+                "path/to/image2.png" // Hình ảnh bàn
+        ));
+
+        list.add(new ModelOrder(
+                3, // ID đơn hàng
+                103, // ID bàn
+                "Chờ thanh toán", // Trạng thái đơn hàng
+                450000, // Tổng tiền
+                LocalDateTime.now().minusHours(4), // Thời gian tạo
+                LocalDateTime.now().minusMinutes(15), // Thời gian cập nhật
+                "Đang phục vụ", // Trạng thái bàn
+                "path/to/image3.png" // Hình ảnh bàn
+        ));
+
+        list.add(new ModelOrder(
+                4, // ID đơn hàng
+                104, // ID bàn
+                "Hủy", // Trạng thái đơn hàng
+                200000, // Tổng tiền
+                LocalDateTime.now().minusMinutes(10), // Thời gian tạo
+                LocalDateTime.now(), // Thời gian cập nhật
+                "Chờ thanh toán", // Trạng thái bàn
+                "path/to/image4.png" // Hình ảnh bàn
+        ));
+        return  list;
+    }
     public static List<ModelEmployee> getSampleEmployeeData(boolean defaultIcon) {
         List<ModelEmployee> list = new ArrayList<>();
-//        list.add(new ModelEmployee( 1750, "Business Analyst", "Analytical thinker with experience in business process improvement.", new ModelProfile(getProfileIcon("profile_1.jpg", defaultIcon), "Hannah Scott", "Washington, D.C.")));
+        list.add(new ModelEmployee( 1750, "Business Analyst", "Analytical thinker with experience in business process improvement.", new ModelProduct(getProfileIcon("profile_1.jpg", defaultIcon), "Hannah Scott", "Washington, D.C.")));
 //        list.add(new ModelEmployee( 1200, "Marketing Manager", "Experienced marketing professional with a focus on digital advertising.", new ModelProfile(getProfileIcon("profile_2.jpg", defaultIcon), "Samantha Smith", "New York City")));
 //        list.add(new ModelEmployee( 1500, "Software Engineer", "Skilled developer proficient in Java, Python, and JavaScript.", new ModelProfile(getProfileIcon("profile_3.jpg", defaultIcon), "John Johnson", "Los Angeles")));
 //        list.add(new ModelEmployee( 1300, "Graphic Designer", "Creative designer with expertise in Adobe Creative Suite.", new ModelProfile(getProfileIcon("profile_4.jpg", defaultIcon), "Emily Brown", "Chicago")));

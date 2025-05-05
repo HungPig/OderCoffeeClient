@@ -1,7 +1,5 @@
 package Order.Modal.model;
 
-import Order.Modal.model.ModelProfile;
-
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
@@ -32,15 +30,15 @@ public class ModelEmployee {
         this.description = description;
     }
 
-    public ModelProfile getProfile() {
+    public ModelProduct getProfile() {
         return profile;
     }
 
-    public void setProfile(ModelProfile profile) {
+    public void setProfile(ModelProduct profile) {
         this.profile = profile;
     }
 
-    public ModelEmployee( double salary, String position, String description, ModelProfile profile) {
+    public ModelEmployee( double salary, String position, String description, ModelProduct profile) {
         this.salary = salary;
         this.position = position;
         this.description = description;
@@ -50,7 +48,7 @@ public class ModelEmployee {
     private double salary;
     private String position;
     private String description;
-    private ModelProfile profile;
+    private ModelProduct profile;
 
     public Object[] toTableRowBasic(int row) {
         NumberFormat nf = new DecimalFormat("$ #,##0.##");
