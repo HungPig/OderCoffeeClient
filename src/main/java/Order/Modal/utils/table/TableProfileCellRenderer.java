@@ -1,11 +1,11 @@
 package Order.Modal.utils.table;
 
-import Order.Modal.model.ModelProfile;
+import Order.Modal.model.ModelProduct;
 import com.formdev.flatlaf.FlatClientProperties;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
-import javax.swing.table.TableCellRenderer;
+        import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 
 public class TableProfileCellRenderer extends JPanel implements TableCellRenderer {
@@ -34,15 +34,15 @@ public class TableProfileCellRenderer extends JPanel implements TableCellRendere
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         JLabel com = (JLabel) delegate.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-        if (value instanceof ModelProfile) {
-            ModelProfile profile = (ModelProfile) value;
+        if (value instanceof ModelProduct) {
+            ModelProduct profile = (ModelProduct) value;
             if (profile.getIcon() != null) {
                 labelProfile.setIcon(profile.getIcon());
             } else {
                 labelProfile.setIcon(null);
             }
             labelName.setText(profile.getName());
-            labelLocation.setText(profile.getLocation());
+            labelLocation.setText(String.valueOf(profile.getCategory()));
             setBackground(com.getBackground());
             setBorder(com.getBorder());
             return this;

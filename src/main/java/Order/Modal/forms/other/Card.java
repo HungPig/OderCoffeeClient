@@ -1,6 +1,7 @@
 package Order.Modal.forms.other;
 
 import Order.Modal.model.ModelEmployee;
+import Order.Modal.model.ModelOrder;
 import com.formdev.flatlaf.FlatClientProperties;
 import net.miginfocom.swing.MigLayout;
 import raven.extras.AvatarIcon;
@@ -10,12 +11,10 @@ import java.util.function.Consumer;
 
 public class Card extends JPanel {
 
-    private final ModelEmployee employee;
-    private final Consumer<ModelEmployee> event;
+    private final ModelOrder order;
 
-    public Card(ModelEmployee employee, Consumer<ModelEmployee> event) {
-        this.employee = employee;
-        this.event = event;
+    public Card(ModelOrder order) {
+        this.order = order;
         init();
     }
 
@@ -40,40 +39,38 @@ public class Card extends JPanel {
         JPanel header = new JPanel(new MigLayout("fill,insets 0", "[fill]", "[top]"));
         header.putClientProperty(FlatClientProperties.STYLE, "" +
                 "background:null");
-        JLabel label = new JLabel(new AvatarIcon(employee.getProfile().getIcon(), 130, 130, 20));
+        JLabel label = new JLabel(new AvatarIcon(order.getTableImage(), 130, 130, 20));
         header.add(label);
         return header;
     }
 
     private JPanel createBody() {
-        JPanel body = new JPanel(new MigLayout("wrap", "[150]", "[][]push[]"));
-        body.putClientProperty(FlatClientProperties.STYLE, "" +
-                "background:null");
-        JLabel title = new JLabel(employee.getProfile().getName());
-        title.putClientProperty(FlatClientProperties.STYLE, "" +
-                "font:bold +1;");
-        JTextPane description = new JTextPane();
-        description.setEditable(false);
-        description.putClientProperty(FlatClientProperties.STYLE, "" +
-                "border:0,0,0,0;" +
-                "background:null;" +
-                "[light]foreground:tint($Label.foreground,30%);" +
-                "[dark]foreground:shade($Label.foreground,30%)");
-        description.setText(employee.getDescription());
+        // Create body panel
+        JPanel body = new JPanel(new MigLayout("wrap", "[grow,fill]", "[][]push[]"));
+        body.putClientProperty(FlatClientProperties.STYLE, "background:null");
 
-        JButton button = new JButton("View");
-        button.addActionListener(e -> event.accept(employee));
-        button.putClientProperty(FlatClientProperties.STYLE, "" +
-                "arc:999;" +
-                "margin:3,25,3,25;" +
-                "borderWidth:1;" +
-                "focusWidth:0;" +
-                "innerFocusWidth:0;" +
-                "background:null;");
+        // Add order details
+        JLabel orderIdLabel = new JLabel("Mã đơn hàng: " + order.getId());
+        orderIdLabel.putClientProperty(FlatClientProperties.STYLE, "font:bold +1;");
+        body.add(orderIdLabel);
 
-        body.add(title);
-        body.add(description);
-        body.add(button);
+        JLabel orderStatusLabel = new JLabel("Trạng thái: " + order.getStatus());
+        orderStatusLabel.putClientProperty(FlatClientProperties.STYLE, "font:plain;");
+        body.add(orderStatusLabel);
+
+        JLabel tableInfoLabel = new JLabel("Số bàn: " + order.getTableId() + " - Trạng thái Bàn: " + order.getTableStatus());
+        tableInfoLabel.putClientProperty(FlatClientProperties.STYLE, "font:plain;");
+        body.add(tableInfoLabel);
+
+        JLabel totalAmountLabel = new JLabel("Tổng tiền: " + order.getTotal() + " đồng");
+        totalAmountLabel.putClientProperty(FlatClientProperties.STYLE, "font:plain;");
+        body.add(totalAmountLabel);
+
+        // 🆕 Add time label here
+        JLabel timeLabel = new JLabel("Thời gian: " + order.getCreatedAt());
+        timeLabel.putClientProperty(FlatClientProperties.STYLE, "font:italic;");
+        body.add(timeLabel);
+
         return body;
     }
 
