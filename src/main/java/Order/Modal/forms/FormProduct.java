@@ -1,17 +1,13 @@
 package Order.Modal.forms;
 
 import Order.Modal.Api.APIClient;
-import Order.Modal.Api.CategoryAPI;
 import Order.Modal.Api.ProductAPI;
-import Order.Modal.Entity.categories;
 import Order.Modal.Entity.products;
 import Order.Modal.Response.ApiResponse;
-import Order.Modal.Response.category.CreateCategoryResponse;
-import Order.Modal.Response.category.DeleteCategoryResponse;
 import Order.Modal.Response.products.CreatedProductReponse;
 import Order.Modal.Response.products.DeleteProductResponse;
 import Order.Modal.System.Form;
-import Order.Modal.model.ModelProfile;
+import Order.Modal.model.ModelProduct;
 import Order.Modal.utils.ComboItem;
 import Order.Modal.utils.DisplayUtils;
 import Order.Modal.utils.SystemForm;
@@ -76,7 +72,7 @@ public class FormProduct extends Form {
                     return Boolean.class;
                 // use profile class
                 if (columnIndex == 2) {
-                    return ModelProfile.class;
+                    return ModelProduct.class;
                 }
                 return super.getColumnClass(columnIndex);
             }
@@ -101,7 +97,7 @@ public class FormProduct extends Form {
         table.getTableHeader().setReorderingAllowed(false);
 
         // apply profile cell renderer
-        table.setDefaultRenderer(ModelProfile.class, new TableProfileCellRenderer(table));
+        table.setDefaultRenderer(ModelProduct.class, new TableProfileCellRenderer(table));
 
         table.getModel().addTableModelListener(e -> {
             if (e.getColumn() == 0) {
@@ -177,7 +173,7 @@ public class FormProduct extends Form {
                         model.addRow(new Object[]{
                                 false,
                                 product.getId(),
-                                new ModelProfile(
+                                new ModelProduct(
                                         getProfileIcon(product.getImage(), defaultIcon),
                                         product.getName(),
                                         DisplayUtils.getCategoryName(product.getCategory_id())
@@ -383,7 +379,7 @@ public class FormProduct extends Form {
                                 model.addRow(new Object[]{
                                         false,
                                         product.getId(),
-                                        new ModelProfile(
+                                        new ModelProduct(
                                                 getProfileIcon(product.getImage(), defaultIcon),
                                                 product.getName(),
                                                 DisplayUtils.getCategoryName(product.getCategory_id())

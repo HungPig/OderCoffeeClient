@@ -7,9 +7,9 @@ import javax.swing.*;
 
 @Setter
 @Getter
-public class ModelProfile {
+public class ModelProduct {
 
-    public ModelProfile(Icon icon, String name, String category) {
+    public ModelProduct(Icon icon, String name, String category) {
         this.icon = icon;
         this.name = name;
         this.category = category;
