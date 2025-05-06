@@ -88,7 +88,6 @@ public class MyDrawerBuilder extends SimpleDrawerBuilder {
                 new Item.Label("MAIN MENU"),
                 new Item("Dashboard", "forms.svg"),
                 new Item("Orders", "components.svg"),
-                new Item("Customers", "email.svg"),
                 new Item("Reports", "chat.svg"),
                 new Item.Label("OTHER"),
                 new Item("About", "about.svg"),
