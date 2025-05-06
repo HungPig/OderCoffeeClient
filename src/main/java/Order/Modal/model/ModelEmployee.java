@@ -5,13 +5,6 @@ import java.text.NumberFormat;
 
 public class ModelEmployee {
 
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
-    }
 
     public double getSalary() {
         return salary;
@@ -37,35 +30,33 @@ public class ModelEmployee {
         this.description = description;
     }
 
-    public ModelProfile getProfile() {
+    public ModelProduct getProfile() {
         return profile;
     }
 
-    public void setProfile(ModelProfile profile) {
+    public void setProfile(ModelProduct profile) {
         this.profile = profile;
     }
 
-    public ModelEmployee(String date, double salary, String position, String description, ModelProfile profile) {
-        this.date = date;
+    public ModelEmployee( double salary, String position, String description, ModelProduct profile) {
         this.salary = salary;
         this.position = position;
         this.description = description;
         this.profile = profile;
     }
 
-    private String date;
     private double salary;
     private String position;
     private String description;
-    private ModelProfile profile;
+    private ModelProduct profile;
 
     public Object[] toTableRowBasic(int row) {
         NumberFormat nf = new DecimalFormat("$ #,##0.##");
-        return new Object[]{ row, profile.getName(), profile.getLocation(), date, nf.format(salary), position, description};
+        return new Object[]{ row, profile.getName(), profile.getCategory(),  nf.format(salary), position, description};
     }
 
     public Object[] toTableRowCustom(int row) {
         NumberFormat nf = new DecimalFormat("$ #,##0.##");
-        return new Object[]{false, row, profile, date, nf.format(salary), position, description, profile};
+        return new Object[]{false, row, profile,  nf.format(salary), position, description, profile};
     }
 }
