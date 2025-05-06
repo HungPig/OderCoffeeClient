@@ -1,13 +1,10 @@
 package Order.Modal.themes;
-
-import Order.Modal.Ultis.DemoPreferences;
+import Order.Modal.utils.DemoPreferences;
 import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.IntelliJTheme;
 import com.formdev.flatlaf.extras.FlatAnimatedLafChange;
 import com.formdev.flatlaf.util.LoggingFacade;
 import net.miginfocom.swing.MigLayout;
-
-
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;

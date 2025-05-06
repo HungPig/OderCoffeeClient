@@ -1,10 +1,9 @@
-package Order.Modal.Ultis;
+package Order.Modal.utils;
 
 import Order.Modal.themes.PanelThemes;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.formdev.flatlaf.IntelliJTheme;
 import com.formdev.flatlaf.util.LoggingFacade;
-
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Arrays;
