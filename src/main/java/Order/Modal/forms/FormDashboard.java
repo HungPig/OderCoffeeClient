@@ -16,8 +16,6 @@ import com.formdev.flatlaf.extras.FlatSVGIcon;
 import com.formdev.flatlaf.util.UIScale;
 import net.miginfocom.swing.MigLayout;
 import org.jfree.chart.renderer.xy.CandlestickRenderer;
-
-
 import javax.swing.*;
 import java.awt.*;
 import java.util.Objects;
@@ -54,7 +52,10 @@ public class FormDashboard extends Form {
         cardBox.setValueAt(1, "$52,420.55", "less then previous month", "-5%", false);
         cardBox.setValueAt(2, "$3,180.00", "more then previous month", "+12%", true);
         cardBox.setValueAt(3, "$49,240.55", "more then previous month", "+7%", true);
-
+//        main\java\Order\Modal\forms\FormDashboard.java:4:25
+//        java: cannot access Order.Modal.Utils.SystemForm
+//        bad class file: /C:/Users/admin/IdeaProjects/OderCoffeeClient/target/classes/Order/Modal/Utils/SystemForm.class
+//        class file contains wrong class
         // load data chart
         timeSeriesChart.setDataset(SampleData.getTimeSeriesDataset());
         candlestickChart.setDataset(SampleData.getOhlcDataset());
@@ -149,7 +150,6 @@ public class FormDashboard extends Form {
 
     private JPanel panelLayout;
     private CardBox cardBox;
-
     private TimeSeriesChart timeSeriesChart;
     private CandlestickChart candlestickChart;
     private BarChart barChart;
