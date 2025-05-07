@@ -7,13 +7,13 @@ import retrofit2.http.*;
 
 public interface TableAPI {
     @GET("/api/table")
-    Call<CreatedTableResponse> getAllOrder();
+    Call<CreatedTableResponse> getAllTabel();
     @GET("/api/table/{id}")
-    Call<CreatedTableResponse> getOrderId(@Path("id") String id);
+    Call<CreatedTableResponse> getTabelId(@Path("id") int id);
     @POST("/api/table")
-    Call<CreatedTableResponse> addOrder(@Body tables Order);
+    Call<CreatedTableResponse> addTable(@Body tables table);
     @DELETE("/api/table/{id}")
-    Call<DeleteTableResponse> deleteOrder(@Path("id") String id);
+    Call<DeleteTableResponse> deleteTable(@Path("id") String id);
     @PATCH("/api/table/{id}")
-    Call<CreatedTableResponse> updateOrder(@Path("id") String id, @Body tables Order);
+    Call<CreatedTableResponse> updateTable(@Path("id") String id, @Body tables table);
 }

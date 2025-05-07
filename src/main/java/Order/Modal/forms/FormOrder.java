@@ -1,290 +1,308 @@
 package Order.Modal.forms;
 
-import Order.Modal.forms.other.Card;
-import Order.Modal.layout.ResponsiveLayout;
-import Order.Modal.model.ModelOrder;
-import Order.Modal.sample.SampleData;
+import Order.Modal.Api.APIClient;
+import Order.Modal.Api.OrderAPI;
+import Order.Modal.Entity.orders;
+import Order.Modal.Response.ApiResponse;
+import Order.Modal.Response.orders.CreatedOrderResponse;
+import Order.Modal.Response.orders.DeleteOrderResponse;
+import Order.Modal.Response.orders.OrderResponse;
 import Order.Modal.System.Form;
+import Order.Modal.model.ModelProduct;
+import Order.Modal.utils.ComboItem;
 import Order.Modal.utils.SystemForm;
+import Order.Modal.utils.table.CheckBoxTableHeaderRenderer;
+import Order.Modal.utils.table.TableHeaderAlignment;
+import Order.Modal.utils.table.TableProfileCellRenderer;
 import com.formdev.flatlaf.FlatClientProperties;
+import com.formdev.flatlaf.extras.FlatSVGIcon;
 import net.miginfocom.swing.MigLayout;
+import raven.modal.ModalDialog;
+import raven.modal.component.SimpleModalBorder;
+import raven.modal.option.Location;
+import raven.modal.option.Option;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 
 @SystemForm(name = "Order", description = "Order form display some details")
 public class FormOrder extends Form {
-    private JPanel panelCard;
-    private JPanel detailPanel;
-    private JTextField searchField;
-    private List<ModelOrder> filteredOrders;
-    private ModelOrder selectedOrder;
-    private NumberFormat currencyFormatter;
+    private JPanel panel;
+    private JTextField txtFieldID;
+    private JTextField JTextAmount;
+    private JTextField JTextFieldItems;
+    private JComboBox<Integer> comboTable_ID;
+    private JComboBox<String> comboStatus;
+    private JTable table;
 
     public FormOrder() {
-        currencyFormatter = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
-        filteredOrders = new ArrayList<>(SampleData.getSampleOrderData());
         init();
+        loadData();
     }
 
     private void init() {
         setLayout(new MigLayout("fillx,wrap,insets 10 0 10 0", "[fill]", "[][]0[fill,grow]"));
-        add(createHeader());
-        add(createSeparator(), "growx");
-        add(createMainContent(), "grow");
-    }
+        // create table model
+        Object columns[] = new Object[]{"SELECT", "#", "Table Id", "Items", "Amount", "Status"};
+        DefaultTableModel model = new DefaultTableModel(columns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                // allow cell editable at column 0 for checkbox
+                return column == 0;
+            }
 
-    private Component createHeader() {
-        JPanel panel = new JPanel(new MigLayout("fillx", "[][push][]", "[]"));
-
-        // Tiêu đề
-        JLabel title = new JLabel("Quản lý đơn hàng");
-        title.putClientProperty(FlatClientProperties.STYLE, "font:bold +6");
-
-        // Mô tả
-        JLabel description = new JLabel("Xem và quản lý các đơn hàng trong hệ thống");
-        description.putClientProperty(FlatClientProperties.STYLE, "font: -1; foreground: lighten(@foreground, 30%)");
-
-
-        JPanel titlePanel = new JPanel(new MigLayout("wrap", "[]", "[]0[]"));
-        titlePanel.setOpaque(false);
-        titlePanel.add(title);
-        titlePanel.add(description);
-
-        panel.add(titlePanel);
-
-        return panel;
-    }
-
-
-
-    private Component createSeparator() {
-        JSeparator separator = new JSeparator();
-        separator.putClientProperty(FlatClientProperties.STYLE, "background: lighten(@foreground, 70%)");
-        return separator;
-    }
-
-    private Component createMainContent() {
-        JSplitPane splitPane = new JSplitPane();
-        splitPane.setResizeWeight(0.6);
-        splitPane.setContinuousLayout(true);
-
-        // Left component - Order cards
-        JPanel leftPanel = new JPanel(new BorderLayout());
-        ResponsiveLayout responsiveLayout = new ResponsiveLayout(ResponsiveLayout.JustifyContent.FIT_CONTENT, new Dimension(-1, -1), 15, 15);
-        panelCard = new JPanel(responsiveLayout);
-        panelCard.putClientProperty(FlatClientProperties.STYLE, "background: lighten(@background, 2%); border:10,10,10,10;");
-
-        JScrollPane scrollPane = new JScrollPane(panelCard);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder());
-        scrollPane.getHorizontalScrollBar().setUnitIncrement(16);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
-        scrollPane.getHorizontalScrollBar().putClientProperty(FlatClientProperties.STYLE, "" +
-                "trackArc:$ScrollBar.thumbArc;" +
-                "thumbInsets:0,0,0,0;" +
-                "width:5;");
-        scrollPane.getVerticalScrollBar().putClientProperty(FlatClientProperties.STYLE, "" +
-                "trackArc:$ScrollBar.thumbArc;" +
-                "thumbInsets:0,0,0,0;" +
-                "width:5;");
-
-        leftPanel.add(scrollPane, BorderLayout.CENTER);
-
-        // Right component - Order details
-        detailPanel = createDetailPanel();
-
-        splitPane.setLeftComponent(leftPanel);
-        splitPane.setRightComponent(detailPanel);
-
-        return splitPane;
-    }
-
-    private JPanel createDetailPanel() {
-        JPanel panel = new JPanel(new MigLayout("wrap,fillx,insets 20", "[fill]", "[]10[]10[]10[]"));
-        panel.putClientProperty(FlatClientProperties.STYLE, "background: lighten(@background, 1%)");
-
-        JLabel titleLabel = new JLabel("Chi tiết đơn hàng");
-        titleLabel.putClientProperty(FlatClientProperties.STYLE, "font:bold +2");
-
-        JLabel noSelectionLabel = new JLabel("Chọn một đơn hàng để xem chi tiết");
-        noSelectionLabel.putClientProperty(FlatClientProperties.STYLE, "foreground: lighten(@foreground, 30%)");
-        noSelectionLabel.setHorizontalAlignment(SwingConstants.CENTER);
-
-        panel.add(titleLabel);
-        panel.add(new JSeparator(), "growx");
-        panel.add(noSelectionLabel, "alignx center, gaptop 30");
-
-        return panel;
-    }
-
-    private JPanel createOrderDetailPanel(ModelOrder order) {
-        JPanel panel = new JPanel(new MigLayout("wrap,fillx,insets 20", "[fill]", "[]10[]10[]"));
-        panel.putClientProperty(FlatClientProperties.STYLE, "background: lighten(@background, 1%)");
-
-        // Header
-        JPanel headerPanel = new JPanel(new MigLayout("fillx", "[]push[]", "[]"));
-        headerPanel.setOpaque(false);
-
-        JLabel titleLabel = new JLabel("Chi tiết đơn hàng #" + order.getId());
-        titleLabel.putClientProperty(FlatClientProperties.STYLE, "font:bold +2");
-
-
-        headerPanel.add(titleLabel);
-
-
-        // Order info
-        JPanel infoPanel = new JPanel(new MigLayout("wrap 2, fillx, insets 15", "[30%][70%]", "[]10[]10[]10[]"));
-        infoPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1, true));
-        infoPanel.setOpaque(false);
-
-        addInfoRow(infoPanel, "Mã đơn hàng:", + order.getId());
-        addInfoRow(infoPanel, "Bàn:", order.getTableId());
-        addInfoRow(infoPanel, "Trạng thái:", getStatusLabel(order.getStatus()));
-        addInfoRow(infoPanel, "Thời gian:", order.getUpdatedAt().toString());
-        addInfoRow(infoPanel, "Tổng tiền:", formatCurrency(order.getTotal()));
-
-        // Order items
-        JPanel itemsPanel = new JPanel(new MigLayout("wrap, fillx, insets 15", "[fill]", "[]10[]"));
-        itemsPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1, true));
-        itemsPanel.setOpaque(false);
-
-        JLabel itemsTitle = new JLabel("Các món trong đơn");
-        itemsTitle.putClientProperty(FlatClientProperties.STYLE, "font:bold +1");
-
-        // Create table for items
-        String[] columns = {"Món", "Số Lượng", "Đơn giá", "Thành tiền"};
-        Object[][] data = {
-                {"Cà Phê", 2, formatCurrency(35000), formatCurrency(170000)},
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                // use boolean type at column 0 for checkbox
+                if (columnIndex == 0)
+                    return Boolean.class;
+                // use profile class
+                return super.getColumnClass(columnIndex);
+            }
         };
 
-        JTable itemsTable = new JTable(data, columns);
-        itemsTable.setShowGrid(false);
-        itemsTable.setIntercellSpacing(new Dimension(0, 8));
-        itemsTable.setRowHeight(30);
-        itemsTable.getTableHeader().putClientProperty(FlatClientProperties.STYLE, "font:bold; background:lighten(@background, 5%)");
 
-        JScrollPane tableScrollPane = new JScrollPane(itemsTable);
-        tableScrollPane.setBorder(BorderFactory.createEmptyBorder());
+        // create table
+        table = new JTable(model);
 
-        itemsPanel.add(itemsTitle);
-        itemsPanel.add(tableScrollPane);
+        // table scroll
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        // table option
+        table.getColumnModel().getColumn(0).setMaxWidth(50);
+        table.getColumnModel().getColumn(1).setMaxWidth(50);
+        table.getColumnModel().getColumn(2).setPreferredWidth(50);
+        table.getColumnModel().getColumn(3).setPreferredWidth(100);
+        table.getColumnModel().getColumn(4).setPreferredWidth(100);
+        table.getColumnModel().getColumn(5).setPreferredWidth(250);
 
-        // Action buttons
-        JPanel actionPanel = new JPanel(new MigLayout("fillx", "[grow][grow][grow]", "[]"));
-        actionPanel.setOpaque(false);
+        // disable reordering table column
+        table.getTableHeader().setReorderingAllowed(false);
 
-        JButton editButton = new JButton("Chỉnh sửa");
-        editButton.putClientProperty(FlatClientProperties.BUTTON_TYPE, "roundRect");
+        // apply profile cell renderer
+        table.setDefaultRenderer(ModelProduct.class, new TableProfileCellRenderer(table));
 
-        JButton completeButton = new JButton("Hoàn thành");
-        completeButton.putClientProperty(FlatClientProperties.STYLE, "background: #4CAF50; foreground: #FFFFFF; borderWidth: 0");
+        table.getModel().addTableModelListener(e -> {
+            if (e.getColumn() == 0) {
+                int changedRow = e.getFirstRow();
+                for (int i = 0; i < table.getRowCount(); i++) {
+                    if (i != changedRow && (Boolean) table.getValueAt(i, 0)) {
+                        table.setValueAt(false, i, 0);
+                    }
+                }
+            }
+        });
 
-        JButton cancelButton = new JButton("Hủy đơn");
-        cancelButton.putClientProperty(FlatClientProperties.STYLE, "background: #F44336; foreground: #FFFFFF; borderWidth: 0");
+        // apply checkbox custom to table header
+        table.getColumnModel().getColumn(0).setHeaderRenderer(new CheckBoxTableHeaderRenderer(table, 0));
 
-        actionPanel.add(editButton, "growx");
-        actionPanel.add(completeButton, "growx");
-        actionPanel.add(cancelButton, "growx");
+        // alignment table header
+        table.getTableHeader().setDefaultRenderer(new TableHeaderAlignment(table) {
+            @Override
+            protected int getAlignment(int column) {
+                if (column == 1) {
+                    return SwingConstants.CENTER;
+                }
+                return SwingConstants.LEADING;
+            }
+        });
 
-        // Add all components to main panel
-        panel.add(headerPanel);
-        panel.add(new JSeparator(), "growx");
-        panel.add(infoPanel, "growx");
-        panel.add(itemsPanel, "growx");
-        panel.add(actionPanel, "growx");
+        // style
+        putClientProperty(FlatClientProperties.STYLE, "" +
+                "arc:20;" +
+                "background:$Table.background;");
+        table.getTableHeader().putClientProperty(FlatClientProperties.STYLE, "" +
+                "height:30;" +
+                "hoverBackground:null;" +
+                "pressedBackground:null;" +
+                "separatorColor:$TableHeader.background;");
+        table.putClientProperty(FlatClientProperties.STYLE, "" +
+                "rowHeight:70;" +
+                "showHorizontalLines:true;" +
+                "intercellSpacing:0,1;" +
+                "cellFocusColor:$TableHeader.hoverBackground;" +
+                "selectionBackground:$TableHeader.hoverBackground;" +
+                "selectionInactiveBackground:$TableHeader.hoverBackground;" +
+                "selectionForeground:$Table.foreground;");
+        scrollPane.getVerticalScrollBar().putClientProperty(FlatClientProperties.STYLE, "" +
+                "trackArc:$ScrollBar.thumbArc;" +
+                "trackInsets:3,3,3,3;" +
+                "thumbInsets:3,3,3,3;" +
+                "background:$Table.background;");
 
+        // create title
+        JLabel title = new JLabel("Orders");
+        title.putClientProperty(FlatClientProperties.STYLE, "" +
+                "font:bold +2");
+        add(title, "gapx 20");
+
+        // create header
+        add(createHeaderAction());
+        add(scrollPane);
+    }
+
+    private void loadData() {
+        try {
+            OrderAPI orderAPI = APIClient.getClient().create(OrderAPI.class);
+            orderAPI.getAllOrder().enqueue(new Callback<OrderResponse>() {
+                @Override
+                public void onResponse(Call<OrderResponse> call, Response<OrderResponse> response) {
+                    if (response.isSuccessful()) {
+                        DefaultTableModel model = (DefaultTableModel) table.getModel();
+                        model.setRowCount(0);
+                        assert response.body() != null;
+                        for (orders order : response.body().getData()) {
+                            model.addRow(new Object[]{
+                                    false,
+                                    order.getId(),
+                                    order.getTable_id(),
+                                    order.getItems(),
+                                    order.getTotal_amount(),
+                                    order.getStatus(),
+
+                            });
+                        }
+                        table.setModel(model);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<OrderResponse> call, Throwable throwable) {
+                    JOptionPane.showMessageDialog(FormOrder.this,
+                            "Lỗi kết nối API: " + throwable.getMessage(),
+                            "Lỗi",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private Component createHeaderAction() {
+        JPanel panel = new JPanel(new MigLayout("insets 5 20 5 20", "[fill,230]push[][]"));
+
+        JTextField txtSearch = new JTextField();
+        txtSearch.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Search...");
+        txtSearch.putClientProperty(FlatClientProperties.TEXT_FIELD_LEADING_ICON, new FlatSVGIcon("Order/icons/search.svg", 0.4f));
+        JButton cmdCreate = new JButton("Create");
+        JButton cmdEdit = new JButton("Edit");
+        JButton cmdDelete = new JButton("Delete");
+        JButton cmdDetails = new JButton("Details");
+
+        cmdCreate.addActionListener(e -> showModal());
+        cmdEdit.addActionListener(e -> edit());
+        cmdDelete.addActionListener(e -> delete());
+
+        panel.add(txtSearch);
+        panel.add(cmdCreate);
+        panel.add(cmdEdit);
+        panel.add(cmdDelete);
+        panel.add(cmdDetails);
+
+        panel.putClientProperty(FlatClientProperties.STYLE, "background:null;");
         return panel;
     }
 
-    private void addInfoRow(JPanel panel, String label, Object value) {
-        JLabel labelComponent = new JLabel(label);
-        labelComponent.putClientProperty(FlatClientProperties.STYLE, "foreground: lighten(@foreground, 30%)");
+    private void showModal() {
+        Option option = ModalDialog.createOption();
+        option.getLayoutOption().setSize(-1, 1f)
+                .setLocation(Location.TRAILING, Location.TOP)
+                .setAnimateDistance(0.7f, 0);
+        ModalDialog.showModal(this, new SimpleModalBorder(
+                inputProduct(), "Create", SimpleModalBorder.YES_NO_OPTION,
+                (controller, action) -> {
+                    if (action == SimpleModalBorder.YES_OPTION) {
+                        orders order = new orders();
+                        order.setId(txtFieldID.getText());
+                        order.setItems(Integer.parseInt(JTextFieldItems.getText()));
+                        order.setTotal_amount(Integer.valueOf(JTextAmount.getText()));
+                        order.setStatus(comboStatus.getSelectedItem().toString());
+                        order.setTable_id((Integer) comboTable_ID.getSelectedItem());
+                        OrderAPI orderAPI = APIClient.getClient().create(OrderAPI.class);
+                        orderAPI.addOrder(order).enqueue(new Callback<CreatedOrderResponse>() {
 
-        JComponent valueComponent;
-        if (value instanceof JComponent) {
-            valueComponent = (JComponent) value;
-        } else {
-            valueComponent = new JLabel(value.toString());
-            valueComponent.putClientProperty(FlatClientProperties.STYLE, "font:bold");
-        }
+                            @Override
+                            public void onResponse(Call<CreatedOrderResponse> call, Response<CreatedOrderResponse> response) {
+                                if (response.isSuccessful()) {
+                                    JOptionPane.showMessageDialog(null, "Đơn hàng đã được tạo thành công!");
+                                    txtFieldID.setText("");
+                                    loadData();
+                                } else {
+                                    JOptionPane.showMessageDialog(null, "Tạo đơn hàng thất bại!");
+                                }
+                            }
 
-        panel.add(labelComponent);
-        panel.add(valueComponent);
+                            @Override
+                            public void onFailure(Call<CreatedOrderResponse> call, Throwable throwable) {
+                                JOptionPane.showMessageDialog(null, "Lỗi kết nối: " + throwable.getMessage());
+                            }
+                        });
+                    }
+                }), option);
     }
 
-    private JLabel getStatusLabel(String status) {
-        JLabel label = new JLabel(getStatusText(status));
-        label.setOpaque(true);
-        label.setBorder(new EmptyBorder(3, 8, 3, 8));
-        label.putClientProperty(FlatClientProperties.STYLE, getStatusStyle(status));
-        return label;
+    public Component inputProduct() {
+        JPanel panel = new JPanel(new MigLayout("fillx,wrap,insets 5 30 5 30,width 400", "[fill]", ""));
+        txtFieldID = new JTextField();
+        comboTable_ID = new JComboBox<>();
+        JTextFieldItems = new JTextField();
+        JTextAmount = new JTextField();
+        comboStatus = new JComboBox<>();
+
+        txtFieldID.setEditable(false);
+        txtFieldID.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "ID will be generated automatically");
+
+        JLabel lbTitle = new JLabel("Please complete the following Category to add data!");
+        lbTitle.putClientProperty(FlatClientProperties.STYLE, "font:+2");
+        panel.add(lbTitle, "gapy 5 0");
+        panel.add(new JSeparator(), "height 2!,gapy 0 5");
+
+
+        panel.add(createInputField("ID", txtFieldID));
+        panel.add(createInputField("Items", JTextFieldItems));
+        panel.add(createInputField("Amount", JTextAmount));
+        panel.add(createInputField("Table", comboTable_ID));
+        panel.add(createInputField("Status", comboStatus));
+        initComboStatus(comboStatus);
+        initComboTable(comboTable_ID);
+        return panel;
     }
 
-    private String getStatusText(String status) {
-        switch (status.toLowerCase()) {
-            case "processing": return "Đang xử lý";
-            case "completed": return "Hoàn thành";
-            case "cancelled": return "Đã hủy";
-            default: return status;
-        }
+    private void initComboTable(JComboBox<Integer> combo) {
+        combo.removeAllItems();
+        combo.addItem(1);
+        combo.addItem(2);
+        combo.addItem(3);
+        combo.addItem(4);
+        combo.addItem(5);
     }
 
-    private String getStatusStyle(String status) {
-        switch (status.toLowerCase()) {
-            case "processing": return "background: #2196F3; foreground: #FFFFFF; arc: 10";
-            case "completed": return "background: #4CAF50; foreground: #FFFFFF; arc: 10";
-            case "cancelled": return "background: #F44336; foreground: #FFFFFF; arc: 10";
-            default: return "background: #9E9E9E; foreground: #FFFFFF; arc: 10";
-        }
+    private void initComboStatus(JComboBox<String> combo) {
+        combo.removeAllItems();
+        combo.addItem("Đơn hàng mới");
+        combo.addItem("Đã xử lý");
+        combo.addItem("Đã huỷ");
     }
 
-    private String formatCurrency(double amount) {
-        return currencyFormatter.format(amount).replace("₫", "") + " ₫";
+    private JPanel createInputField(String label, JComponent field) {
+        JPanel panel = new JPanel(new MigLayout("fillx,wrap", "[fill]", ""));
+        JLabel lb = new JLabel(label);
+        lb.putClientProperty(FlatClientProperties.STYLE, "font:+1");
+        panel.add(lb);
+        panel.add(field);
+        return panel;
     }
 
-    @Override
-    public void formInit() {
-        refreshOrderCards();
+    private void edit() {
+        JOptionPane.showMessageDialog(null, "Edit functionality.");
     }
 
-    private void refreshOrderCards() {
-        panelCard.removeAll();
-
-        for (ModelOrder order : filteredOrders) {
-            Card card = new Card(order);
-            card.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    selectedOrder = order;
-                    updateDetailPanel();
-                }
-            });
-            panelCard.add(card);
-        }
-
-        panelCard.repaint();
-        panelCard.revalidate();
+    private void delete() {
+        JOptionPane.showMessageDialog(null, "Delete functionality.");
     }
-
-    private void updateDetailPanel() {
-        if (selectedOrder != null) {
-            Container parent = detailPanel.getParent();
-            parent.remove(detailPanel);
-            detailPanel = createOrderDetailPanel(selectedOrder);
-            parent.add(detailPanel);
-            parent.revalidate();
-            parent.repaint();
-        }
-    }
-
 }
