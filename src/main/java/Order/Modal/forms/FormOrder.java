@@ -1,9 +1,10 @@
 package Order.Modal.forms;
 
 import Order.Modal.Api.APIClient;
+import Order.Modal.Api.CategoryAPI;
 import Order.Modal.Api.OrderAPI;
 import Order.Modal.Entity.orders;
-import Order.Modal.Response.ApiResponse;
+import Order.Modal.Response.category.DeleteCategoryResponse;
 import Order.Modal.Response.orders.CreatedOrderResponse;
 import Order.Modal.Response.orders.DeleteOrderResponse;
 import Order.Modal.Response.orders.OrderResponse;
@@ -35,11 +36,18 @@ public class FormOrder extends Form {
     private JTextField txtFieldID;
     private JTextField JTextAmount;
     private JTextField JTextFieldItems;
-    private JComboBox<Integer> comboTable_ID;
-    private JComboBox<String> comboStatus;
+    private JComboBox comboTable_ID;
+    private JComboBox comboStatus;
     private JTable table;
 
     public FormOrder() {
+        txtFieldID = new JTextField();
+        JTextFieldItems = new JTextField();
+        JTextAmount = new JTextField();
+        comboTable_ID = new JComboBox<>();
+        comboStatus = new JComboBox<>();
+        initComboTable(comboTable_ID);
+        initComboStatus(comboStatus);
         init();
         loadData();
     }
@@ -214,15 +222,13 @@ public class FormOrder extends Form {
                 .setLocation(Location.TRAILING, Location.TOP)
                 .setAnimateDistance(0.7f, 0);
         ModalDialog.showModal(this, new SimpleModalBorder(
-                inputProduct(), "Create", SimpleModalBorder.YES_NO_OPTION,
+                inputOrder(), "Create", SimpleModalBorder.YES_NO_OPTION,
                 (controller, action) -> {
                     if (action == SimpleModalBorder.YES_OPTION) {
                         orders order = new orders();
-                        order.setId(txtFieldID.getText());
-                        order.setItems(Integer.parseInt(JTextFieldItems.getText()));
+                        order.setItems(Integer.valueOf(JTextFieldItems.getText()));
                         order.setTotal_amount(Integer.valueOf(JTextAmount.getText()));
                         order.setStatus(comboStatus.getSelectedItem().toString());
-                        order.setTable_id((Integer) comboTable_ID.getSelectedItem());
                         OrderAPI orderAPI = APIClient.getClient().create(OrderAPI.class);
                         orderAPI.addOrder(order).enqueue(new Callback<CreatedOrderResponse>() {
 
@@ -246,18 +252,14 @@ public class FormOrder extends Form {
                 }), option);
     }
 
-    public Component inputProduct() {
+    public Component inputOrder() {
         JPanel panel = new JPanel(new MigLayout("fillx,wrap,insets 5 30 5 30,width 400", "[fill]", ""));
-        txtFieldID = new JTextField();
-        comboTable_ID = new JComboBox<>();
-        JTextFieldItems = new JTextField();
-        JTextAmount = new JTextField();
-        comboStatus = new JComboBox<>();
+
 
         txtFieldID.setEditable(false);
         txtFieldID.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "ID will be generated automatically");
 
-        JLabel lbTitle = new JLabel("Please complete the following Category to add data!");
+        JLabel lbTitle = new JLabel("Please complete the following Order to add data!");
         lbTitle.putClientProperty(FlatClientProperties.STYLE, "font:+2");
         panel.add(lbTitle, "gapy 5 0");
         panel.add(new JSeparator(), "height 2!,gapy 0 5");
@@ -268,18 +270,16 @@ public class FormOrder extends Form {
         panel.add(createInputField("Amount", JTextAmount));
         panel.add(createInputField("Table", comboTable_ID));
         panel.add(createInputField("Status", comboStatus));
-        initComboStatus(comboStatus);
-        initComboTable(comboTable_ID);
         return panel;
     }
 
-    private void initComboTable(JComboBox<Integer> combo) {
+    private void initComboTable(JComboBox<ComboItem> combo) {
         combo.removeAllItems();
-        combo.addItem(1);
-        combo.addItem(2);
-        combo.addItem(3);
-        combo.addItem(4);
-        combo.addItem(5);
+        combo.addItem(new ComboItem(1, "Bàn 1"));
+        combo.addItem(new ComboItem(2, "Bàn 2"));
+        combo.addItem(new ComboItem(3, "Bàn 3"));
+        combo.addItem(new ComboItem(4, "Bàn 4"));
+        combo.addItem(new ComboItem(5, "Bàn 5"));
     }
 
     private void initComboStatus(JComboBox<String> combo) {
@@ -299,10 +299,130 @@ public class FormOrder extends Form {
     }
 
     private void edit() {
-        JOptionPane.showMessageDialog(null, "Edit functionality.");
+        int selectedRow = -1;
+        for (int i = 0; i < table.getRowCount(); i++) {
+            Boolean isChecked = (Boolean) table.getValueAt(i, 0);
+            if (isChecked != null && isChecked) {
+                selectedRow = i;
+                break;
+            }
+        }
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(null, "Please select a Order to edit.");
+            return;
+        }
+        String orderId = table.getValueAt(selectedRow, 1).toString();
+        OrderAPI orderAPI = APIClient.getClient().create(OrderAPI.class);
+        orderAPI.getOrderId(orderId).enqueue(new Callback<CreatedOrderResponse>() {
+            @Override
+            public void onResponse(Call<CreatedOrderResponse> call, Response<CreatedOrderResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    orders order = response.body().getData();
+                    txtFieldID.setText(order.getId());
+                    JTextFieldItems.setText(String.valueOf(order.getItems()));
+                    JTextAmount.setText(String.valueOf(order.getTotal_amount()));
+                    selectComboItemByValue(comboTable_ID, String.valueOf(order.getTable_id()));
+                    comboStatus.setSelectedItem(order.getStatus());
+                    System.out.println("Table ID: " + order.getTable_id());
+                    System.out.println("Status: " + order.getStatus());
+                    Option option = ModalDialog.createOption();
+                    option.getLayoutOption().setSize(-1, 1f)
+                            .setLocation(Location.TRAILING, Location.TOP)
+                            .setAnimateDistance(0.7f, 0);
+                    ModalDialog.showModal(FormOrder.this, new SimpleModalBorder(
+                            inputOrder(), "Edit Order", SimpleModalBorder.YES_NO_OPTION,
+                            (controller, action) -> {
+                                if (action == SimpleModalBorder.YES_OPTION) {
+                                    order.setItems(Integer.valueOf(JTextFieldItems.getText()));
+                                    order.setTotal_amount(Integer.valueOf(JTextAmount.getText()));
+                                    // Cập nhật table_id
+                                    if (comboTable_ID.getSelectedItem() != null) {
+                                        ComboItem selectedTable = (ComboItem) comboTable_ID.getSelectedItem();
+                                        order.setTable_id(((ComboItem) comboTable_ID.getSelectedItem()).getId());
+                                        System.out.println("New Table ID selected: " + selectedTable.getId() + " (" + selectedTable.getValue() + ")");
+                                    }
+
+                                    // Cập nhật status
+                                    if (comboStatus.getSelectedItem() != null) {
+                                        String selectedStatus = (String) comboStatus.getSelectedItem();
+                                        order.setStatus(selectedStatus);
+                                        System.out.println("New Status selected: " + selectedStatus);
+                                    }
+                                    orderAPI.updateOrder(order.getId(), order).enqueue(new Callback<CreatedOrderResponse>() {
+                                        @Override
+                                        public void onResponse(Call<CreatedOrderResponse> call, Response<CreatedOrderResponse> response) {
+                                            if (response.isSuccessful()) {
+                                                JOptionPane.showMessageDialog(null, "Order updated successfully.");
+                                                loadData();
+                                            } else {
+                                                JOptionPane.showMessageDialog(null, "Update failed.");
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onFailure(Call<CreatedOrderResponse> call, Throwable t) {
+                                            JOptionPane.showMessageDialog(null, "Error: " + t.getMessage());
+                                        }
+                                    });
+                                }
+                            }
+                    ), option);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Order not found.");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CreatedOrderResponse> call, Throwable t) {
+                JOptionPane.showMessageDialog(null, "Error: " + t.getMessage());
+            }
+        });
     }
 
+    private void selectComboItemByValue(JComboBox comboBox, String value) {
+        for (int i = 0; i < comboBox.getItemCount(); i++) {
+            ComboItem item = (ComboItem) comboBox.getItemAt(i);
+            if (String.valueOf(item.getId()).equals(value)) {
+                comboBox.setSelectedIndex(i);
+                break;
+            }
+        }
+    }
+
+
+
     private void delete() {
-        JOptionPane.showMessageDialog(null, "Delete functionality.");
+        int selectedRow = -1;
+        for (int i = 0; i < table.getRowCount(); i++) {
+            Boolean isChecked = (Boolean) table.getValueAt(i, 0);
+            if (isChecked != null && isChecked) {
+                selectedRow = i;
+                break;
+            }
+        }
+
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn một danh mục để xoá.", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        int result = JOptionPane.showConfirmDialog(null, "Confirm", "Are you sure?", JOptionPane.YES_NO_OPTION);
+        String orderId = table.getValueAt(selectedRow, 1).toString();
+        if (result == JOptionPane.YES_OPTION) {
+            OrderAPI orderAPI = APIClient.getClient().create(OrderAPI.class);
+            orderAPI.deleteOrder(orderId).enqueue(new Callback<DeleteOrderResponse>() {
+                @Override
+                public void onResponse(Call<DeleteOrderResponse> call, Response<DeleteOrderResponse> response) {
+                    if (response.isSuccessful()) {
+                        JOptionPane.showMessageDialog(null, "Order deleted successfully.");
+                        loadData();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<DeleteOrderResponse> call, Throwable throwable) {
+                    JOptionPane.showMessageDialog(null, throwable.getMessage());
+                }
+            });
+        }
     }
 }

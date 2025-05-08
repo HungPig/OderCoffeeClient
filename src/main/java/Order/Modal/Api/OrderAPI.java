@@ -14,7 +14,7 @@ public interface OrderAPI {
     @GET("/api/order")
     Call<OrderResponse> getAllOrder();
     @GET("/api/order/{id}")
-    Call<CreatedOrderResponse> getOrderId(@Path("id") int id);
+    Call<CreatedOrderResponse> getOrderId(@Path("id") String id);
     @POST("/api/order")
     Call<CreatedOrderResponse> addOrder(@Body orders Order);
     @DELETE("/api/order/{id}")

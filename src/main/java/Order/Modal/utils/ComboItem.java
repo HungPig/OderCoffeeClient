@@ -19,4 +19,8 @@ public class ComboItem {
         return name;  //
     }
 
+
+    public String getValue() {
+        return name;
+    }
 }
