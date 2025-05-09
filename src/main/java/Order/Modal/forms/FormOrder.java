@@ -1,15 +1,15 @@
 package Order.Modal.forms;
 
 import Order.Modal.Api.APIClient;
-import Order.Modal.Api.CategoryAPI;
 import Order.Modal.Api.OrderAPI;
 import Order.Modal.Entity.orders;
-import Order.Modal.Response.category.DeleteCategoryResponse;
 import Order.Modal.Response.orders.CreatedOrderResponse;
 import Order.Modal.Response.orders.DeleteOrderResponse;
 import Order.Modal.Response.orders.OrderResponse;
 import Order.Modal.System.Form;
+import Order.Modal.forms.other.OrderItem;
 import Order.Modal.model.ModelProduct;
+import Order.Modal.simple.OrderDetailsForm;
 import Order.Modal.utils.ComboItem;
 import Order.Modal.utils.SystemForm;
 import Order.Modal.utils.table.CheckBoxTableHeaderRenderer;
@@ -191,6 +191,8 @@ public class FormOrder extends Form {
         }
     }
 
+
+
     private Component createHeaderAction() {
         JPanel panel = new JPanel(new MigLayout("insets 5 20 5 20", "[fill,230]push[][]"));
 
@@ -205,7 +207,25 @@ public class FormOrder extends Form {
         cmdCreate.addActionListener(e -> showModal());
         cmdEdit.addActionListener(e -> edit());
         cmdDelete.addActionListener(e -> delete());
+        OrderItem orderItem = new OrderItem();
+        cmdDetails.addActionListener(actionEvent -> {
+            int selectedRow = table.getSelectedRow();
+            if (selectedRow >= 0) {
+                // Lấy orderId từ dòng được chọn
+                String orderIdStr = (String) table.getValueAt(selectedRow, 1);
 
+                // Truyền orderId vào OrderDetailsForm
+                OrderDetailsForm detailsForm = new OrderDetailsForm(orderIdStr);
+
+                ModalDialog.showModal(this,
+                        new SimpleModalBorder(detailsForm, null, SimpleModalBorder.DEFAULT_OPTION, (controller, action) -> {
+                            // Optional: xử lý khi modal đóng nếu cần
+                        })
+                );
+            } else {
+                JOptionPane.showMessageDialog(this, "Vui lòng chọn một đơn hàng trước.");
+            }
+        });
         panel.add(txtSearch);
         panel.add(cmdCreate);
         panel.add(cmdEdit);
@@ -215,6 +235,8 @@ public class FormOrder extends Form {
         panel.putClientProperty(FlatClientProperties.STYLE, "background:null;");
         return panel;
     }
+
+
 
     private void showModal() {
         Option option = ModalDialog.createOption();
@@ -270,6 +292,12 @@ public class FormOrder extends Form {
         panel.add(createInputField("Amount", JTextAmount));
         panel.add(createInputField("Table", comboTable_ID));
         panel.add(createInputField("Status", comboStatus));
+        return panel;
+    }
+
+    public Component orderDetails()
+    {
+        JPanel panel = new JPanel(new MigLayout("fillx,wrap,insets 5 30 5 30,width 400", "[fill]", ""));
         return panel;
     }
 

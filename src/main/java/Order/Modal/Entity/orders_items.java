@@ -15,7 +15,7 @@ public class orders_items implements Serializable {
     @SerializedName("id")
     private Integer id;
     @SerializedName("order_id")
-    private Integer order_id;
+    private String order_id;
     @SerializedName("product_id")
     private Integer product_id;
     @SerializedName("quantity")
@@ -28,4 +28,6 @@ public class orders_items implements Serializable {
     private String notes;
     @SerializedName("createAt")
     private Date createdAt;
+
+
 }
