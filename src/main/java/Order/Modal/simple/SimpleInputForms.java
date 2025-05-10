@@ -17,39 +17,69 @@ public class SimpleInputForms extends JPanel {
 
     private void init() {
         setLayout(new MigLayout("fillx,wrap,insets 5 30 5 30,width 400", "[fill]", ""));
-        txtFirstName = new JTextField();
-        JTextField txtLastName = new JTextField();
-        JTextField txtCompany = new JTextField();
-        JTextField txtEmail = new JTextField();
-        JComboBox comboCountry = new JComboBox();
+        JTextField txtOrderId = new JTextField();
+        JTextField txtProductId = new JTextField();
+        JTextField txtQuantity = new JTextField();
+        JTextField txtSubtotal = new JTextField();
+        JComboBox comboStatus = new JComboBox<>();
+        JTextArea txtNotes = new JTextArea();
+        JTextField txtStatus = new JTextField();
 
         JTextArea txtAddress = new JTextArea();
         txtAddress.setWrapStyleWord(true);
         txtAddress.setLineWrap(true);
         JScrollPane scroll = new JScrollPane(txtAddress);
+        JLabel lbTitle = new JLabel("Chi tiết đơn hàng #1001");
+        JLabel lbTime = new JLabel("04/05/2025 23:12:34");
 
-        // style
-        txtFirstName.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "First");
-        txtLastName.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Last");
-        txtCompany.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "e.g. Tesla Motors");
+        add(lbTitle, "split 2");
+        add(lbTime, "gapleft push");
 
-        // add to panel
-        createTitle("Contact info");
+        add(new JSeparator(), "grow");
 
-        add(new JLabel("Full name"), "gapy 5 0");
-        add(txtFirstName, "split 2");
-        add(txtLastName);
-        add(new JLabel("Company name"), "gapy 5 0");
-        add(txtCompany);
-        add(new JLabel("Email address"), "gapy 5 0");
-        add(txtEmail);
-        add(new JLabel("Country"), "gapy 5 0");
-        add(comboCountry);
+        // ID và Trạng thái
+        add(new JLabel("ID"), "split 2");
+        add(new JLabel("Trạng thái"), "gapleft push, wrap");
 
-        createTitle("Delivery address");
+        txtOrderId = new JTextField();
+        txtStatus = new JTextField();
 
-        add(new JLabel("Address"), "gapy 5 0");
-        add(scroll, "height 150,grow,pushy");
+        add(txtOrderId, "split 2");
+        add(txtStatus, "gapleft push");
+
+        add(new JSeparator(), "grow");
+
+        // Product ID
+        add(new JLabel("Mã sản phẩm:"));
+        txtProductId = new JTextField();
+        add(txtProductId);
+
+        // Quantity
+        add(new JLabel("Số lượng:"));
+        txtQuantity = new JTextField();
+        add(txtQuantity);
+
+        // Subtotal
+        add(new JLabel("Tổng tiền:"));
+        txtSubtotal = new JTextField();
+        add(txtSubtotal);
+
+        add(new JSeparator(), "grow");
+
+        // Notes
+        add(new JLabel("Ghi chú:"));
+        txtNotes = new JTextArea();
+        txtNotes.setLineWrap(true);
+        txtNotes.setWrapStyleWord(true);
+        JScrollPane scrollNotes = new JScrollPane(txtNotes);
+        add(scrollNotes, "height 100");
+
+        // Buttons
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(new JButton("Xoá"));
+        buttonPanel.add(new JButton("Đóng"));
+        buttonPanel.add(new JButton("Chỉnh sửa"));
+        add(buttonPanel, "gapy 10");
 
         txtAddress.addKeyListener(new KeyAdapter() {
             @Override
@@ -62,7 +92,7 @@ public class SimpleInputForms extends JPanel {
                 }
             }
         });
-        initComboItem(comboCountry);
+        initComboItem(comboStatus);
     }
 
     private void createTitle(String title) {
