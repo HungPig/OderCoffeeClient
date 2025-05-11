@@ -4,13 +4,13 @@ An internal order management system where customers place drink orders , and the
 
 ## Features
 
-- 🤖 Integration with multiple AI models via Ollama
-- 💬 Chat interface with real-time message streaming
-- 🧠 "Thinking" indicators showing the AI's reasoning process
-- 📚 Chat history management
-- 👥 User authentication and account management
-- 🔄 Model switching during conversations
-- 📱 Responsive design for desktop and mobile
+- Onboarding
+- Dashboard
+- Live Chat
+- Manager Order
+- Manager Product
+- Manager Categories
+- Customer Database
 
 ## Tech Stack
 
@@ -21,44 +21,33 @@ An internal order management system where customers place drink orders , and the
 - Midlayout - setsize
 - Retrofit to consume RESTful APIs
 - JTable for displaying orders
-
 ### Backend
-
 - Spring Boot 3
 - Spring Data JPA
+### Database 
 - Mysql for data storage
-- SpringMVC for reactive APIs
-
-### Infrastructure
-
-- Docker & Docker Compose
-
-## Prerequisites
-
-- Docker & Docker Compose
-- Git
-
+##Deployment Infrastructure
+- **Azure**: Cloud hosting
+- **Docker & Docker Compose**: Containerized deployment
+- **GitHub**: Source code version control
+- **Postman**: API testing
 ## Quick Start with Docker
 
 The fastest way to get started is using Docker Compose:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/vivu-chat.git
-cd vivu-chat
+git clone [https://github.com/HungPig/OderCoffeeClient](https://github.com/HungPig/OderCoffeeClient)
+cd order-coffee
 
 # Start all services
 cd src
 docker-compose up -d
-
-# Pull an AI model (after services are running)
-docker exec -it vivuchat-ollama ollama pull gemma:2b
 ```
 
 After the services are running, access:
 - Desktop: http://localhost
 - API: http://localhost:8080
-- Ollama: http://localhost:11434
 
 ## Running on Apple Silicon (M1/M2)
 
@@ -124,18 +113,15 @@ If you experience any architecture-related issues:
 The Docker setup uses environment variables to configure the services. The key variables are already set in the `docker-compose.yml` file, but you can customize them:
 
 ```yaml
-# PostgreSQL settings
-POSTGRES_DB: vivuchat
-POSTGRES_USER: postgres
-POSTGRES_PASSWORD: postgres
+# MySQL
+MYSQL_DATABASE=ordercoffee
+MYSQL_USER=root
+MYSQL_PASSWORD=your_password
 
-# Backend settings
-SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/vivuchat
-OLLAMA_API_BASE_URL: http://ollama:11434
-APP_OLLAMA_APIURL: http://ollama:11434/api
-
-# Frontend settings 
-VITE_API_BASE_URL: /api
+# Spring Boot
+SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/ordercoffee
+SPRING_DATASOURCE_USERNAME=root
+SPRING_DATASOURCE_PASSWORD=your_password
 ```
 
 ### Running Different AI Models
