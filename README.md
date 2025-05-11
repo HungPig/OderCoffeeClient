@@ -26,7 +26,7 @@ An internal order management system where customers place drink orders , and the
 - Spring Data JPA
 ### Database 
 - Mysql for data storage
-##Deployment Infrastructure
+### Deployment Infrastructure
 - **Azure**: Cloud hosting
 - **Docker & Docker Compose**: Containerized deployment
 - **GitHub**: Source code version control
