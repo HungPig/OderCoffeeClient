@@ -51,7 +51,7 @@ public class OrderDetailsForm extends JPanel {
 
     // Default constructor for testing
     public OrderDetailsForm() {
-       // Default to invalid orderId
+        // Default to invalid orderId
     }
 
     // Constructor with orderId parameter
@@ -193,7 +193,7 @@ public class OrderDetailsForm extends JPanel {
         // Set up the main panel with drawer-like layout
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder());
-        setPreferredSize(new Dimension(450, 600));
+        setPreferredSize(new Dimension(450, 650)); // Slightly increased height for Your Order section
 
         // Create header panel
         headerPanel = createHeaderPanel();
@@ -292,6 +292,120 @@ public class OrderDetailsForm extends JPanel {
         panel.add(new JSeparator());
         panel.add(Box.createRigidArea(new Dimension(0, 15)));
 
+        // Your Order section - ADDED THIS SECTION
+        JPanel yourOrderPanel = new JPanel();
+        yourOrderPanel.setLayout(new BoxLayout(yourOrderPanel, BoxLayout.Y_AXIS));
+        yourOrderPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        yourOrderPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 200));
+
+        JLabel yourOrderTitle = new JLabel("Đơn hàng của bạn");
+        yourOrderTitle.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        yourOrderTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
+        yourOrderPanel.add(yourOrderTitle);
+        yourOrderPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        // Container for order items with scroll capability
+        JPanel itemsContainer = new JPanel();
+        itemsContainer.setLayout(new BoxLayout(itemsContainer, BoxLayout.Y_AXIS));
+        itemsContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        // Sample order item 1 - Cà phê
+        JPanel item1Panel = new JPanel(new BorderLayout());
+        item1Panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+        item1Panel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        item1Panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(230, 230, 230)));
+
+        JPanel item1Left = new JPanel(new BorderLayout());
+        JLabel item1Name = new JLabel("Cà phê sữa đá");
+        item1Name.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        JLabel item1Code = new JLabel("Mã: CF001");
+        item1Code.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        item1Code.setForeground(new Color(120, 120, 120));
+        item1Left.add(item1Name, BorderLayout.NORTH);
+        item1Left.add(item1Code, BorderLayout.CENTER);
+
+        JPanel item1Right = new JPanel(new BorderLayout());
+        JLabel item1Quantity = new JLabel("1 × 29,000 VNĐ");
+        item1Quantity.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        item1Quantity.setHorizontalAlignment(JLabel.RIGHT);
+        JLabel item1Total = new JLabel("29,000 VNĐ");
+        item1Total.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        item1Total.setHorizontalAlignment(JLabel.RIGHT);
+        item1Right.add(item1Quantity, BorderLayout.NORTH);
+        item1Right.add(item1Total, BorderLayout.CENTER);
+
+        item1Panel.add(item1Left, BorderLayout.WEST);
+        item1Panel.add(item1Right, BorderLayout.EAST);
+
+        // Sample order item 2 - Trà sữa
+        JPanel item2Panel = new JPanel(new BorderLayout());
+        item2Panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+        item2Panel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        item2Panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(230, 230, 230)));
+
+        JPanel item2Left = new JPanel(new BorderLayout());
+        JLabel item2Name = new JLabel("Trà sữa trân châu");
+        item2Name.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        JLabel item2Code = new JLabel("Mã: TS002");
+        item2Code.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        item2Code.setForeground(new Color(120, 120, 120));
+        item2Left.add(item2Name, BorderLayout.NORTH);
+        item2Left.add(item2Code, BorderLayout.CENTER);
+
+        JPanel item2Right = new JPanel(new BorderLayout());
+        JLabel item2Quantity = new JLabel("1 × 35,000 VNĐ");
+        item2Quantity.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        item2Quantity.setHorizontalAlignment(JLabel.RIGHT);
+        JLabel item2Total = new JLabel("35,000 VNĐ");
+        item2Total.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        item2Total.setHorizontalAlignment(JLabel.RIGHT);
+        item2Right.add(item2Quantity, BorderLayout.NORTH);
+        item2Right.add(item2Total, BorderLayout.CENTER);
+
+        item2Panel.add(item2Left, BorderLayout.WEST);
+        item2Panel.add(item2Right, BorderLayout.EAST);
+
+        // Add items to container
+        itemsContainer.add(item1Panel);
+        itemsContainer.add(Box.createRigidArea(new Dimension(0, 5)));
+        itemsContainer.add(item2Panel);
+
+        // Add scroll capability if needed
+        JScrollPane scrollPane = new JScrollPane(itemsContainer);
+        scrollPane.setBorder(null);
+        scrollPane.setPreferredSize(new Dimension(400, 120));
+        scrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        yourOrderPanel.add(scrollPane);
+
+        // Total for all items
+        JPanel totalPanel = new JPanel(new BorderLayout());
+        totalPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        totalPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        totalPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 0, new Color(230, 230, 230)));
+        totalPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
+
+        JLabel totalLabel = new JLabel("Tổng cộng:");
+        totalLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+
+        JLabel totalValue = new JLabel("64,000 VNĐ");
+        totalValue.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        totalValue.setHorizontalAlignment(JLabel.RIGHT);
+
+        totalPanel.add(totalLabel, BorderLayout.WEST);
+        totalPanel.add(totalValue, BorderLayout.EAST);
+
+        yourOrderPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        yourOrderPanel.add(totalPanel);
+
+        panel.add(yourOrderPanel);
+
+        // Separator after Your Order section
+        panel.add(Box.createRigidArea(new Dimension(0, 15)));
+        panel.add(new JSeparator());
+        panel.add(Box.createRigidArea(new Dimension(0, 15)));
+        // End of Your Order section
+
         // Order details section
         JPanel detailsPanel = new JPanel();
         detailsPanel.setLayout(new BoxLayout(detailsPanel, BoxLayout.Y_AXIS));
@@ -329,8 +443,8 @@ public class OrderDetailsForm extends JPanel {
         txtNotes.setWrapStyleWord(true);
         txtNotes.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Note");
 
-        JScrollPane scrollPane = new JScrollPane(txtNotes);
-        panel.add(scrollPane, "growx, h 100:100:");
+        JScrollPane notesScrollPane = new JScrollPane(txtNotes);
+        panel.add(notesScrollPane, "growx, h 100:100:");
 
         panel.add(notesPanel);
 
@@ -506,6 +620,4 @@ public class OrderDetailsForm extends JPanel {
         revalidate();
         repaint();
     }
-
-
 }

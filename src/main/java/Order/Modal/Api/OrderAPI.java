@@ -1,12 +1,9 @@
 package Order.Modal.Api;
 
 import Order.Modal.Entity.orders;
-import Order.Modal.Entity.tables;
 import Order.Modal.Response.orders.CreatedOrderResponse;
 import Order.Modal.Response.orders.DeleteOrderResponse;
 import Order.Modal.Response.orders.OrderResponse;
-import Order.Modal.Response.tables.CreatedTableResponse;
-import Order.Modal.Response.tables.DeleteTableResponse;
 import retrofit2.Call;
 import retrofit2.http.*;
 

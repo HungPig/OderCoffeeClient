@@ -20,4 +20,8 @@ public class tables implements Serializable {
     private Date createdAt;
     @SerializedName("updated_at")
     private Date updatedAt;
+    @Override
+    public String toString() {
+        return "Bàn " + id;
+    }
 }
