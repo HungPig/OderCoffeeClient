@@ -123,41 +123,6 @@ SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/ordercoffee
 SPRING_DATASOURCE_USERNAME=root
 SPRING_DATASOURCE_PASSWORD=your_password
 ```
-
-### Running Different AI Models
-
-Ollama supports various AI models. To use a different model:
-
-```bash
-# List available models
-docker exec -it vivuchat-ollama ollama list
-
-# Pull a new model
-docker exec -it vivuchat-ollama ollama pull llama3:8b
-docker exec -it vivuchat-ollama ollama pull gemma:7b
-
-# For larger models (if you have enough GPU RAM)
-docker exec -it vivuchat-ollama ollama pull mixtral:8x7b
-```
-
-Once you've pulled models, you can select them in the ViVu Chat UI's model selector.
-
-### Enabling GPU Support
-
-For better performance, enable GPU support by modifying the `docker-compose.yml`:
-
-```yaml
-ollama:
-  # ...existing settings...
-  deploy:
-    resources:
-      reservations:
-        devices:
-          - driver: nvidia
-            count: 1
-            capabilities: [gpu]
-```
-
 ### Docker Volume Management
 
 Docker volumes store persistent data:
@@ -176,18 +141,6 @@ docker-compose down -v
 ## Troubleshooting Docker Setup
 
 ### Connection Issues
-
-If the frontend can't connect to the backend:
-- Ensure the `VITE_API_BASE_URL` is set correctly in Dockerfile.client
-- Check NGINX configuration in `deployment/nginx/default.conf`
-- Verify network connectivity: `docker network inspect vivuchat-network`
-
-### Ollama Model Problems
-
-If models aren't loading:
-- Check Ollama logs: `docker logs vivuchat-ollama`
-- Ensure Ollama has enough resources
-- Verify the API URL: `http://ollama:11434`
 
 ### Database Connection Issues
 
@@ -210,16 +163,12 @@ If encountering "exec format error" messages:
 ### Frontend Development (Local)
 
 ```bash
-cd src/client
+# Open the project in your IDE (IntelliJ, NetBeans, Eclipse)
 
-# Install dependencies
-npm install
+# Set JDK 17+ and build the project
 
-# Start development server
-npm run dev
-
-# Build for production
-npm run build
+# Run the main class to start the application
+src/client/MainView.java
 ```
 
 ### Backend Development (Local)
