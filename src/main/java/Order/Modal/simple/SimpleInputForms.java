@@ -48,7 +48,7 @@ public class SimpleInputForms extends JPanel {
         addProductItem(productListPanel, "Trà đào", 35000, 2, 52);
         add(productListPanel, "growx");
         // Quantity
-
+//hihi
         // Subtotal
         add(new JSeparator(), "grow");
         add(new JLabel("Mã sản phẩm:"));
