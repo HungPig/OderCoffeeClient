@@ -28,6 +28,5 @@ public class orders_items implements Serializable {
     private String notes;
     @SerializedName("createAt")
     private Date createdAt;
-
-
+    private products products;
 }

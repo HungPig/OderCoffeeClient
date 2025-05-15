@@ -1,9 +1,15 @@
 package Order.Modal.simple;
 
+import Order.Modal.Api.APIClient;
+import Order.Modal.Api.OrderAPI;
+import Order.Modal.Response.orders.OrderResponse;
 import com.formdev.flatlaf.FlatClientProperties;
 import net.miginfocom.swing.MigLayout;
 import raven.modal.component.ModalBorderAction;
 import raven.modal.component.SimpleModalBorder;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,6 +21,9 @@ public class SimpleInputForms extends JPanel {
     public SimpleInputForms() {
         init();
     }
+
+
+
 
     private void init() {
         setLayout(new MigLayout("fillx,wrap,insets 5 30 5 30,width 400", "[fill]", ""));

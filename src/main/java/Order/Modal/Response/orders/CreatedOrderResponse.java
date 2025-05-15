@@ -1,8 +1,6 @@
 package Order.Modal.Response.orders;
 
-import Order.Modal.Entity.categories;
-import Order.Modal.Entity.orders;
-import Order.Modal.Entity.tables;
+import Order.Modal.Entity.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,4 +12,6 @@ public class CreatedOrderResponse {
     private String message;
     private boolean success;
     private orders data;
+    private List<orders_items> items;
+    private List<products> productsList;
 }

@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Getter
@@ -21,8 +22,17 @@ public class orders implements Serializable {
     private Integer total_amount;
     @SerializedName("createdAt")
     private String created_at;
-    @SerializedName("items")
-    private Integer items;
     @SerializedName("updatedAt")
     private String updated_at;
+    @SerializedName("items")
+    private List<orders_items> items;
+    public int calculateTotalAmount() {
+        int total = 0;
+        if (items != null) {
+            for (orders_items item : items) {
+                total += item.getSubtotal(); // Lấy subtotal của từng item và cộng dồn
+            }
+        }
+        return total;
+    }
 }
