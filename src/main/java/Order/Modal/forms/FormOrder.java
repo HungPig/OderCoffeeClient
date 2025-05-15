@@ -34,6 +34,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -755,30 +756,75 @@ public class FormOrder extends Form {
     //------------------//
     //Order_Items Drawer
     private void showModal() {
-        // Get the selected row from the table
+        // Lấy dòng được chọn từ bảng
         int selectedRow = tableOrder.getSelectedRow();
         if (selectedRow == -1) {
-            // If no row is selected, show an error message
+            // Nếu không có dòng nào được chọn, hiển thị thông báo lỗi
             JOptionPane.showMessageDialog(this, "Vui lòng chọn một đơn hàng để xem chi tiết.", "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        // Retrieve the orderId from the selected row (Column 1 contains the ID)
+        // Lấy orderId từ dòng được chọn (cột 1 chứa ID)
         String orderId = tableOrder.getValueAt(selectedRow, 1).toString();
+
+        // Tạo các tùy chọn nút
+        SimpleModalBorder.Option[] options = {
+                new SimpleModalBorder.Option("Process", 0), // Nút "Process" với action ID = 0
+                new SimpleModalBorder.Option("Cancel", 1)  // Nút "Cancel" với action ID = 1
+        };
+
+        // Tạo dialog với các nút tùy chỉnh
+        SimpleModalBorder modal = new SimpleModalBorder(
+                orderDetail(orderId), // Nội dung của dialog
+                "Chi tiết đơn hàng",  // Tiêu đề của dialog
+                options,              // Các nút tùy chỉnh
+                (controller, action) -> {
+                    if (action == 0) { // Nếu nhấn nút "Process"
+                        updateOrderStatus(Integer.parseInt(orderId),"Đã Hoàn Thành");
+                    } else if (action == 1) { // Nếu nhấn nút "Cancel"
+                        System.out.println("Action canceled");
+                    }
+                }
+        );
+
+        // Hiển thị dialog
         Option option = ModalDialog.createOption();
         option.getLayoutOption().setSize(-1, 1f)
                 .setLocation(Location.TRAILING, Location.TOP)
                 .setAnimateDistance(0.7f, 0);
-        ModalDialog.showModal(this, new SimpleModalBorder(
-                orderDetail(orderId), "OrderDetail", SimpleModalBorder.YES_NO_OPTION,
-                (controller, action) -> {
+        ModalDialog.showModal(this, modal, option);
+    }
+    private void updateOrderStatus(int orderId, String newStatus) {
+        OrderAPI orderAPI = APIClient.getClient().create(OrderAPI.class);
+        orders order = new orders();
+        order.setId(String.valueOf(orderId));
+        order.setStatus(newStatus);
 
-                }), option);
+        orderAPI.updateOrder(order.getId(), order).enqueue(new Callback<CreatedOrderResponse>() {
+            @Override
+            public void onResponse(Call<CreatedOrderResponse> call, Response<CreatedOrderResponse> response) {
+                if (response.isSuccessful()) {
+                    JOptionPane.showMessageDialog(null, "Trạng thái đơn hàng đã được cập nhật thành '" + newStatus + "'!");
+                    loadDataOrder();
+                } else {
+                    try {
+                        String errorMessage = response.errorBody().string();
+                        JOptionPane.showMessageDialog(null, "Đã xảy ra lỗi: " + errorMessage, "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    } catch (IOException e) {
+                        JOptionPane.showMessageDialog(null, "Đã xảy ra lỗi không xác định.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CreatedOrderResponse> call, Throwable throwable) {
+                JOptionPane.showMessageDialog(null, "Lỗi kết nối: " + throwable.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
+        });
     }
 
     private Component orderDetail(String orderId) {
         JPanel panel = new JPanel(new MigLayout("fillx,wrap,insets 5 30 5 30,width 400", "[fill]", ""));
-        JTextArea txtNotes = new JTextArea();
         JLabel lblTableId = new JLabel();
         JLabel lblStatus = new JLabel();
         JLabel lbTitle = new JLabel();

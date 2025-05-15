@@ -15,7 +15,7 @@ public class orders implements Serializable {
     @SerializedName("id")
     private String id;
     @SerializedName("table_id")
-    private int table_id;
+    private Integer table_id;
     @SerializedName("status")
     private String status;
     @SerializedName("total_amount")
