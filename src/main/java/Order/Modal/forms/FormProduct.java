@@ -2,6 +2,7 @@ package Order.Modal.forms;
 
 import Order.Modal.Api.APIClient;
 import Order.Modal.Api.ProductAPI;
+import Order.Modal.Entity.orders;
 import Order.Modal.Entity.products;
 import Order.Modal.Response.ApiResponse;
 import Order.Modal.Response.products.CreatedProductReponse;
@@ -29,9 +30,12 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import static Order.Modal.sample.SampleData.getProfileIcon;
@@ -39,6 +43,7 @@ import static Order.Modal.sample.SampleData.getProfileIcon;
 @SystemForm(name = "Product", description = "Product table with advanced features", tags = {"list", "table"})
 public class FormProduct extends Form {
     private JPanel panel;
+    private List<products> allProducts = new ArrayList<>();
     private JComboBox comboCategory;
     private JTextField txtFieldID;
     private JTextField txtFieldPrice;
@@ -50,6 +55,14 @@ public class FormProduct extends Form {
     private File selectedImageFile;
 
     public FormProduct() {
+         txtFieldID = new JTextField();
+         txtFieldPrice = new JTextField();
+         txtFieldName = new JTextField();
+         txtFieldDescription = new JTextField();
+         comboStatus = new JComboBox();
+         comboCategory = new JComboBox();
+        initComboStatus(comboStatus);
+        initComboCate(comboCategory);
         loadData();
         init();
     }
@@ -165,24 +178,11 @@ public class FormProduct extends Form {
             productAPI.getAllProducts().enqueue(new Callback<ApiResponse<List<products>>>() {
                 @Override
                 public void onResponse(Call<ApiResponse<List<products>>> call, Response<ApiResponse<List<products>>> response) {
-                    DefaultTableModel model = (DefaultTableModel) table.getModel();
-                    model.setRowCount(0);
-                    assert response.body() != null;
-                    boolean defaultIcon = false;
-                    for (products product : response.body().getData()) {
-                        model.addRow(new Object[]{
-                                false,
-                                product.getId(),
-                                new ModelProduct(
-                                        getProfileIcon(product.getImage(), defaultIcon),
-                                        product.getName(),
-                                        DisplayUtils.getCategoryName(product.getCategory_id())
-                                ),
-                                product.getPrice(),
-                                DisplayUtils.getStatusText(product.getStatus()),
-                                product.getDescription()
-                        });
-                        table.setModel(model);
+                    if (response.isSuccessful() && response.body() != null) {
+                        allProducts = response.body().getData(); // Lưu toàn bộ sản phẩm vào danh sách
+                        displayProducts(allProducts); // Hiển thị toàn bộ sản phẩm
+                    } else {
+                        JOptionPane.showMessageDialog(FormProduct.this, "Không thể tải sản phẩm.");
                     }
                 }
 
@@ -216,13 +216,36 @@ public class FormProduct extends Form {
         cmdCreate.addActionListener(e -> showModal());
         cmdEdit.addActionListener(e -> edit());
         cmdDelete.addActionListener(e -> Delete());
-        txtSearch.addActionListener(e -> {
-            String keyword = txtSearch.getText().trim();
-            if (txtSearch.getText().isEmpty()) {
-                loadData();
-            } else {
-                searchProduct(keyword);
+        txtSearch.getDocument().addDocumentListener(new DocumentListener() {
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                filterProducts();
             }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                filterProducts();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                filterProducts();
+            }
+
+            private void filterProducts() {
+                String keyword = txtSearch.getText().trim().toLowerCase();
+                List<products> filtered = new ArrayList<>();
+                for (products product : allProducts) { // allProducts là danh sách tất cả sản phẩm đã tải
+                    if (product.getName().toLowerCase().contains(keyword)
+                            || String.valueOf(product.getId()).contains(keyword)
+                            || DisplayUtils.getCategoryName(product.getCategory_id()).toLowerCase().contains(keyword)) {
+                        filtered.add(product);
+                    }
+                }
+                displayProducts(filtered);
+            }
+
         });
         panel.add(txtSearch);
         panel.add(cmdCreate);
@@ -234,26 +257,30 @@ public class FormProduct extends Form {
         return panel;
     }
 
+    private void displayProducts(List<products> productsList) {
+        SwingUtilities.invokeLater(() -> {
+            DefaultTableModel model = (DefaultTableModel) table.getModel();
+            model.setRowCount(0); // Xóa các dòng cũ
+            boolean defaultIcon = false;
+            for (products product : productsList) {
+                model.addRow(new Object[]{
+                        false,
+                        product.getId(),
+                        new ModelProduct(
+                                getProfileIcon(product.getImage(), defaultIcon),
+                                product.getName(),
+                                DisplayUtils.getCategoryName(product.getCategory_id())
+                        ),
+                        product.getPrice(),
+                        DisplayUtils.getStatusText(product.getStatus()),
+                        product.getDescription()
+                });
+            }
+        });
+    }
+
     public Component inputProduct() {
         JPanel panel = new JPanel(new MigLayout("fillx,wrap,insets 5 30 5 30,width 400", "[fill]", ""));
-        if (txtFieldID == null) {
-            txtFieldID = new JTextField();
-        }
-        if (txtFieldName == null) {
-            txtFieldName = new JTextField();
-        }
-        if (comboCategory == null) {
-            comboCategory = new JComboBox();
-        }
-        if (txtFieldPrice == null) {
-            txtFieldPrice = new JTextField();
-        }
-        if (comboStatus == null) {
-            comboStatus = new JComboBox();
-        }
-        if (txtFieldDescription == null) {
-            txtFieldDescription = new JTextField();
-        }
         txtFieldID.setEditable(false);
         txtFieldID.setEditable(false);
         txtFieldID.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "ID will be generated automatically");
@@ -324,8 +351,6 @@ public class FormProduct extends Form {
         pImage.add(btnChooseImage);
         pImage.add(lblImagePreview, "h 50!, w 100!");
         panel.add(pImage);
-        initComboStatus(comboStatus);
-        initComboCate(comboCategory);
         return panel;
     }
 
@@ -417,7 +442,6 @@ public class FormProduct extends Form {
             JOptionPane.showMessageDialog(null, "Please select a product to edit.");
             return;
         }
-        Component form = inputProduct();
 
         String productId = table.getValueAt(selectedRow, 1).toString();
         ProductAPI productAPI = APIClient.getClient().create(ProductAPI.class);
@@ -431,7 +455,6 @@ public class FormProduct extends Form {
                     txtFieldDescription.setText(product.getDescription());
                     txtFieldPrice.setText(String.valueOf(product.getPrice()));
                     selectComboItemByValue(comboStatus, String.valueOf(product.getStatus()));
-                    selectComboItemByValue(comboCategory, String.valueOf(product.getCategory_id()));
 
                     Option option = ModalDialog.createOption();
                     option.getLayoutOption().setSize(-1, 1f)
