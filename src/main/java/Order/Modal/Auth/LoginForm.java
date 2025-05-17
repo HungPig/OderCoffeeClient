@@ -25,7 +25,7 @@ public class LoginForm extends Form {
 
     private void init() {
         setLayout(new BorderLayout());
-        setBackground(new Color(240, 240, 240));
+        setBackground(UIManager.getColor("Panel.background"));
 
         JPanel card = new JPanel(new MigLayout(
                 "wrap, insets 35 35 25 35, align center center",
