@@ -7,14 +7,14 @@ import javax.swing.*;
 
 @Setter
 @Getter
-public class ModelProfile {
+public class ModelProduct {
 
-    public ModelProfile(Icon icon, String name, String location) {
+    public ModelProduct(Icon icon, String name, String category) {
         this.icon = icon;
         this.name = name;
-        this.location = location;
+        this.category = category;
     }
     private Icon icon;
     private String name;
-    private String location;
+    private String category;
 }

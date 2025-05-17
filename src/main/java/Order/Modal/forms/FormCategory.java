@@ -4,17 +4,12 @@ import Order.Modal.Api.APIClient;
 import Order.Modal.Api.CategoryAPI;
 import Order.Modal.Entity.categories;
 import Order.Modal.Response.ApiResponse;
-import Order.Modal.Response.CategoryResponse;
-import Order.Modal.Response.CreateCategoryResponse;
-import Order.Modal.Response.DeleteCategoryResponse;
+import Order.Modal.Response.category.CategoryResponse;
+import Order.Modal.Response.category.CreateCategoryResponse;
+import Order.Modal.Response.category.DeleteCategoryResponse;
 import Order.Modal.System.Form;
-import Order.Modal.model.ModelEmployee;
-import Order.Modal.model.ModelProfile;
-import Order.Modal.sample.SampleData;
-import Order.Modal.simple.SimpleInputForms;
 import Order.Modal.utils.SystemForm;
 import Order.Modal.utils.table.*;
-import Order.Modal.utils.table.Action.TableActionEvent;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import net.miginfocom.swing.MigLayout;
@@ -80,9 +75,6 @@ public class FormCategory extends Form {
         }
     }
 
-    private void loadAll() {
-
-    }
 
     public Component inputCate() {
         JPanel panel = new JPanel(new MigLayout("fillx,wrap,insets 5 30 5 30,width 400", "[fill]", ""));
@@ -196,6 +188,8 @@ public class FormCategory extends Form {
         };
         return model;
     }
+
+
 
     private Component createHeaderAction() {
         JPanel panel = new JPanel(new MigLayout("insets 5 20 5 20", "[fill,230]push[][]"));

@@ -1,17 +1,19 @@
-package Order.Modal.Response;
+package Order.Modal.Response.tables;
 
-import Order.Modal.Entity.categories;
+import Order.Modal.Entity.tables;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
-public class CreateCategoryResponse {
+public class TableResponse {
     private String message;
     private boolean success;
-    private categories data;
+    private List<tables> data;
 
     public String getMessage() { return message; }
     public boolean isSuccess() { return success; }
-    public categories getData() { return data; }
+    public List<tables> getData() { return data; }
 }
