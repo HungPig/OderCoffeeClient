@@ -120,11 +120,11 @@ public class MyDrawerBuilder extends SimpleDrawerBuilder {
             System.out.println("Drawer menu selected " + Arrays.toString(index));
             Class<?> itemClass = action.getItem().getItemClass();
             int i = index[0];
-            if (i == 5) {
+            if (i == 4) {
                 action.consume();
                 FormManager.showAbout();
                 return;
-            } else if (i == 6) {
+            } else if (i == 5) {
                 action.consume();
                 FormManager.logout();
                 return;
