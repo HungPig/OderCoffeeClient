@@ -14,6 +14,8 @@ import Order.Modal.Response.orders.DeleteOrderResponse;
 import Order.Modal.Response.orders.OrderResponse;
 import Order.Modal.Response.tables.TableResponse;
 import Order.Modal.System.Form;
+import Order.Modal.simple.OrderItemsEditDialog;
+import Order.Modal.simple.OrderItemsListDialog;
 import Order.Modal.utils.SystemForm;
 import Order.Modal.utils.table.CheckBoxTableHeaderRenderer;
 import Order.Modal.utils.table.TableHeaderAlignment;
@@ -220,7 +222,7 @@ public class FormOrder extends Form {
         JButton cmdProceed = new JButton("Details");
 
         cmdCreate.addActionListener(e -> createOrder());
-        cmdEdit.addActionListener(e -> editOrder());
+        cmdEdit.addActionListener(e -> editOrderItem());
         cmdDelete.addActionListener(e -> deleteOrder());
         cmdProceed.addActionListener(e -> showModal());
         txtSearch.getDocument().addDocumentListener(new DocumentListener() {
@@ -642,79 +644,44 @@ public class FormOrder extends Form {
     }
 
 
-    public void editOrder() {
-        int selectedRow = -1;
-        for (int i = 0; i < tableOrder.getRowCount(); i++) {
-            Boolean isChecked = (Boolean) tableOrder.getValueAt(i, 0);
-            if (isChecked != null && isChecked) {
-                selectedRow = i;
-                break;
-            }
-        }
+    private void editOrderItem() {
+        int selectedRow = tableOrder.getSelectedRow();
         if (selectedRow == -1) {
-            JOptionPane.showMessageDialog(null, "Please select a category to edit.");
+            JOptionPane.showMessageDialog(this, "Please select an order to edit.");
             return;
         }
-        String orderId = tableOrder.getValueAt(selectedRow, 1).toString();
+
+        // Lấy orderId từ bảng
+        String orderId = (String) tableOrder.getValueAt(selectedRow, 1);
         OrderAPI orderAPI = APIClient.getClient().create(OrderAPI.class);
+
+        // Gọi API để lấy thông tin order
         orderAPI.getOrderId(orderId).enqueue(new Callback<CreatedOrderResponse>() {
             @Override
             public void onResponse(Call<CreatedOrderResponse> call, Response<CreatedOrderResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     orders order = response.body().getData();
-                    //
-                    txtFieldOrderID.setText(orderId);
-                    txtTotalOrderAmount.setText(String.valueOf(order.getTotal_amount()));
-                    comboOrderStatus.setSelectedItem(order.getStatus());
-                    for (int i = 0; i < comboTableOrder.getItemCount(); i++) {
-                        tables t = comboTableOrder.getItemAt(i);
-                        if (t.getId() == order.getTable_id()) {
-                            comboTableOrder.setSelectedIndex(i);
-                            break;
-                        }
+                    if (order.getItems().isEmpty()) {
+                        JOptionPane.showMessageDialog(FormOrder.this, "No items to edit in this order.");
+                        return;
                     }
-                    String currentStatus = order.getStatus();
-                    for (int i = 0; i < comboOrderStatus.getItemCount(); i++) {
-                        if (comboOrderStatus.getItemAt(i).equals(currentStatus)) {
-                            comboOrderStatus.setSelectedIndex(i);
-                            break;
-                        }
-                    }
-                    Option option = ModalDialog.createOption();
-                    option.getLayoutOption().setSize(-1, 1f)
-                            .setLocation(Location.TRAILING, Location.TOP)
-                            .setAnimateDistance(0.7f, 0);
-                    ModalDialog.showModal(FormOrder.this, new SimpleModalBorder(
-                            inputOrder(), "Edit Category", SimpleModalBorder.YES_NO_OPTION,
-                            (controller, action) -> {
-                                if (action == SimpleModalBorder.YES_OPTION) {
-                                    orderAPI.updateOrder(orderId, order).enqueue(new Callback<CreatedOrderResponse>() {
-                                        @Override
-                                        public void onResponse(Call<CreatedOrderResponse> call, Response<CreatedOrderResponse> response) {
-                                            if (response.isSuccessful()) {
-                                                JOptionPane.showMessageDialog(null, "Order updated successfully.");
-                                                loadDataOrder();
-                                            } else {
-                                                JOptionPane.showMessageDialog(null, "Update failed.");
-                                            }
-                                        }
 
-                                        @Override
-                                        public void onFailure(Call<CreatedOrderResponse> call, Throwable t) {
-                                            JOptionPane.showMessageDialog(null, "Error: " + t.getMessage());
-                                        }
-                                    });
-                                }
-                            }
-                    ), option);
+                    // Mở dialog để hiển thị danh sách order items
+                    SwingUtilities.invokeLater(() -> {
+                        OrderItemsListDialog listDialog = new OrderItemsListDialog((Frame) SwingUtilities.getWindowAncestor(FormOrder.this), order);
+                        listDialog.setVisible(true);
+
+                        // Sau khi chỉnh sửa, tải lại dữ liệu order
+                        loadDataOrder();
+                    });
                 } else {
-                    JOptionPane.showMessageDialog(null, "Order not found.");
+                    JOptionPane.showMessageDialog(FormOrder.this, "Failed to load order details.");
                 }
             }
 
             @Override
             public void onFailure(Call<CreatedOrderResponse> call, Throwable t) {
-                JOptionPane.showMessageDialog(null, "Error: " + t.getMessage());
+                JOptionPane.showMessageDialog(FormOrder.this, "API Error: " + t.getMessage());
             }
         });
     }
