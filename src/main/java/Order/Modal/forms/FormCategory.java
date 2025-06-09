@@ -3,18 +3,15 @@ package Order.Modal.forms;
 import Order.Modal.Api.APIClient;
 import Order.Modal.Api.CategoryAPI;
 import Order.Modal.Entity.categories;
+import Order.Modal.Entity.products;
 import Order.Modal.Response.ApiResponse;
-import Order.Modal.Response.CategoryResponse;
-import Order.Modal.Response.CreateCategoryResponse;
-import Order.Modal.Response.DeleteCategoryResponse;
+import Order.Modal.Response.category.CategoryResponse;
+import Order.Modal.Response.category.CreateCategoryResponse;
+import Order.Modal.Response.category.DeleteCategoryResponse;
 import Order.Modal.System.Form;
-import Order.Modal.model.ModelEmployee;
-import Order.Modal.model.ModelProfile;
-import Order.Modal.sample.SampleData;
-import Order.Modal.simple.SimpleInputForms;
+import Order.Modal.utils.DisplayUtils;
 import Order.Modal.utils.SystemForm;
 import Order.Modal.utils.table.*;
-import Order.Modal.utils.table.Action.TableActionEvent;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import net.miginfocom.swing.MigLayout;
@@ -28,8 +25,11 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @SystemForm(name = "Category", description = "Category form display some details")
@@ -38,6 +38,7 @@ public class FormCategory extends Form {
     private DefaultTableModel model;
     private JTextField txtFieldID;
     private JTextField txtFieldCategoryName;
+    private List<categories> allCategory = new ArrayList<>();
 
     public FormCategory() {
         txtFieldID = new JTextField();
@@ -53,17 +54,9 @@ public class FormCategory extends Form {
                 @Override
                 public void onResponse(Call<CategoryResponse> call, Response<CategoryResponse> response) {
                     if (response.isSuccessful()) {
-                        DefaultTableModel model = (DefaultTableModel) table.getModel();
-                        model.setRowCount(0);
                         assert response.body() != null;
-                        for (categories category : response.body().getData()) {
-                            model.addRow(new Object[]{
-                                    false,
-                                    category.getId(),
-                                    category.getName()
-                            });
-                        }
-                        table.setModel(model);
+                        allCategory = response.body().getData(); // Lưu toàn bộ danh mục vào danh sách
+                        displayCategories(allCategory); // Hiển thị toàn bộ danh mục
                     }
                 }
 
@@ -80,9 +73,6 @@ public class FormCategory extends Form {
         }
     }
 
-    private void loadAll() {
-
-    }
 
     public Component inputCate() {
         JPanel panel = new JPanel(new MigLayout("fillx,wrap,insets 5 30 5 30,width 400", "[fill]", ""));
@@ -197,6 +187,8 @@ public class FormCategory extends Form {
         return model;
     }
 
+
+
     private Component createHeaderAction() {
         JPanel panel = new JPanel(new MigLayout("insets 5 20 5 20", "[fill,230]push[][]"));
 
@@ -210,13 +202,35 @@ public class FormCategory extends Form {
         cmdCreate.addActionListener(e -> Create());
         cmdEdit.addActionListener(e -> Edit());
         cmdDelete.addActionListener(e -> Delete());
-        txtSearch.addActionListener(e -> {
-            String keyword = txtSearch.getText().trim();
-            if (keyword.isEmpty()) {
-                loadData();
-            } else {
-                searchCategories(keyword);
+        txtSearch.getDocument().addDocumentListener(new DocumentListener() {
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                filterCate();
             }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                filterCate();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                filterCate();
+            }
+
+            private void filterCate() {
+                String keyword = txtSearch.getText().trim().toLowerCase();
+                List<categories> filtered = new ArrayList<>();
+                for (categories cate : allCategory) { // allCategory là danh sách tất cả danh mục đã tải
+                    if (cate.getName().toLowerCase().contains(keyword)
+                            || String.valueOf(cate.getId()).contains(keyword)) {
+                        filtered.add(cate); // Thêm đúng đối tượng danh mục (categories)
+                    }
+                }
+                displayCategories(filtered);
+            }
+
         });
         panel.add(txtSearch);
         panel.add(cmdCreate);
@@ -228,42 +242,22 @@ public class FormCategory extends Form {
         return panel;
     }
 
-
-
-
-    private void searchCategories(String keyword) {
-        CategoryAPI categoryAPI = APIClient.getClient().create(CategoryAPI.class);
-        categoryAPI.getCategoriesBySearch(keyword).enqueue(new Callback<ApiResponse<List<categories>>>() {
-            @Override
-            public void onResponse(Call<ApiResponse<List<categories>>> call, Response<ApiResponse<List<categories>>> response) {
-                if (response.isSuccessful()) {
-                    ApiResponse<List<categories>> apiResponse = response.body();
-                    List<categories> categoriesList = apiResponse != null ? apiResponse.getData() : null;
-                    SwingUtilities.invokeLater(() -> {
-                        DefaultTableModel model = (DefaultTableModel) table.getModel();
-                        model.setRowCount(0);
-                        if (categoriesList != null) {
-                            for (categories category : categoriesList) {
-                                model.addRow(new Object[]{
-                                        false,
-                                        category.getId(),
-                                        category.getName()
-                                });
-                            }
-                        }
-                    });
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ApiResponse<List<categories>>> call, Throwable throwable) {
-                JOptionPane.showMessageDialog(FormCategory.this,
-                        "Lỗi khi tìm kiếm: " + throwable.getMessage(),
-                        "Lỗi",
-                        JOptionPane.ERROR_MESSAGE);
+    private void displayCategories(List<categories> categoriesList) {
+        SwingUtilities.invokeLater(() -> {
+            DefaultTableModel model = (DefaultTableModel) table.getModel();
+            model.setRowCount(0); // Xóa các dòng cũ
+            for (categories category : categoriesList) {
+                model.addRow(new Object[]{
+                        false,
+                        category.getId(),
+                        category.getName()
+                });
             }
         });
     }
+
+
+
 
     private void Delete() {
         int selectedRow = -1;
